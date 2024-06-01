@@ -1,0 +1,19 @@
+  .edit-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  
+  .container {
+    border-radius: 10px;
+    width: 100%;
+    height:22rem;
+    margin-top: 2em;
+  }
+
+  .calendar-box {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

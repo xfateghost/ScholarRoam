@@ -37,7 +37,6 @@ const tooltip = {
   styleOverrides: {
     tooltip: {
       maxWidth: pxToRem(200),
-      backgroundColor: black.main,
       color: light.main,
       fontSize: size.sm,
       fontWeight: fontWeightRegular,
@@ -45,10 +44,6 @@ const tooltip = {
       borderRadius: borderRadius.md,
       opacity: 0.7,
       padding: `${pxToRem(5)} ${pxToRem(8)} ${pxToRem(4)}`,
-    },
-
-    arrow: {
-      color: black.main,
     },
   },
 };

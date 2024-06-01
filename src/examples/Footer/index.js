@@ -44,7 +44,7 @@ function Footer({ company, links }) {
 
   return (
     <MDBox
-      width="100%"
+      width="95%"
       display="flex"
       flexDirection={{ xs: "column", lg: "row" }}
       justifyContent="space-between"
@@ -72,7 +72,6 @@ function Footer({ company, links }) {
             &nbsp;{name}&nbsp;
           </MDTypography>
         </Link>
-        for a better web.
       </MDBox>
       <MDBox
         component="ul"
@@ -99,9 +98,9 @@ function Footer({ company, links }) {
 
 // Setting default values for the props of Footer
 Footer.defaultProps = {
-  company: { href: "https://www.creative-tim.com/", name: "Creative Tim" },
+  company: { href: "https://www.creative-tim.com/", name: "ScholarRoam.io" },
   links: [
-    { href: "https://www.creative-tim.com/", name: "Creative Tim" },
+    { href: "https://www.creative-tim.com/", name: "ScholarRoam.io" },
     { href: "https://www.creative-tim.com/presentation", name: "About Us" },
     { href: "https://www.creative-tim.com/blog", name: "Blog" },
     { href: "https://www.creative-tim.com/license", name: "License" },

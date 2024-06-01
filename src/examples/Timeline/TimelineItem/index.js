@@ -47,7 +47,7 @@ function TimelineItem({ color, icon, title, dateTime, description, lastItem }) {
         top="8%"
         left="2px"
         zIndex={2}
-        sx={{ fontSize: ({ typography: { size } }) => size.sm }}
+        sx={{ fontSize: ({ typography: { size } }) => size.xl }}
       >
         <Icon fontSize="inherit">{icon}</Icon>
       </MDBox>

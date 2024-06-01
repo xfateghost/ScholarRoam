@@ -84,10 +84,34 @@ function Basic() {
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
+              <MDInput
+                type="email"
+                label="Email"
+                fullWidth
+                InputProps={{
+                  style: {
+                    fontSize: 15,
+                    padding: "5px",
+                    marginBottom: "20px",
+                    backgroundColor: "white",
+                  },
+                }}
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+              <MDInput
+                type="password"
+                label="Password"
+                fullWidth
+                InputProps={{
+                  style: {
+                    fontSize: 15,
+                    padding: "5px",
+                    marginBottom: "20px",
+                    backgroundColor: "white",
+                  },
+                }}
+              />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />

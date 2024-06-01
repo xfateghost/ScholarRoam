@@ -15,19 +15,51 @@ Coded by www.creative-tim.com
 
 // Material Dashboard 2 React base styles
 import typography from "assets/theme/base/typography";
+import colors from "assets/theme/base/colors";
 
 function configs(labels, datasets) {
   return {
     data: {
       labels,
-      datasets: [...datasets],
+      datasets: datasets.map((dataset) => ({
+        ...dataset,
+        weight: 5,
+        borderWidth: 0,
+        borderRadius: 4,
+        backgroundColor: colors[dataset.color]
+          ? colors[dataset.color || "dark"].main
+          : colors.dark.main,
+        fill: true,
+        maxBarThickness: 55,
+      })),
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false,
+          display: true,
+        },
+        datalabels: {
+          formatter: function (value) {
+            return value.toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            });
+          },
+          display: "auto",
+          anchor: "center",
+          offset: 30,
+          align: "right",
+          font: {
+            size: "12.5",
+            family: typography.fontFamily,
+            style: "normal",
+            weight: "bold",
+          },
+          color: "black",
         },
       },
       scales: {
@@ -39,19 +71,21 @@ function configs(labels, datasets) {
             drawTicks: false,
             borderDash: [5, 5],
           },
+          stacked: true,
           ticks: {
             display: true,
             padding: 10,
             color: "#9ca2b7",
             font: {
-              size: 11,
-              family: typography.fontFamily,
+              size: 12,
+              family: typography.fontFamily, // Make sure typography is correctly imported
               style: "normal",
               lineHeight: 2,
             },
           },
         },
         x: {
+          stacked: true,
           grid: {
             drawBorder: false,
             display: false,
@@ -63,8 +97,8 @@ function configs(labels, datasets) {
             color: "#9ca2b7",
             padding: 10,
             font: {
-              size: 11,
-              family: typography.fontFamily,
+              size: 14,
+              family: typography.fontFamily, // Make sure typography is correctly imported
               style: "normal",
               lineHeight: 2,
             },

@@ -50,6 +50,9 @@ function reducer(state, action) {
     case "FIXED_NAVBAR": {
       return { ...state, fixedNavbar: action.value };
     }
+    case "UPDATE_CHART_DATA": {
+      return { ...state, chartData: action.value };
+    }
     case "OPEN_CONFIGURATOR": {
       return { ...state, openConfigurator: action.value };
     }
@@ -119,6 +122,7 @@ const setOpenConfigurator = (dispatch, value) => dispatch({ type: "OPEN_CONFIGUR
 const setDirection = (dispatch, value) => dispatch({ type: "DIRECTION", value });
 const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
 const setDarkMode = (dispatch, value) => dispatch({ type: "DARKMODE", value });
+const setUpdateChartData = (dispatch, value) => dispatch({ type: "UPDATE_CHART_DATA", value });
 
 export {
   MaterialUIControllerProvider,
@@ -133,4 +137,5 @@ export {
   setDirection,
   setLayout,
   setDarkMode,
+  setUpdateChartData,
 };

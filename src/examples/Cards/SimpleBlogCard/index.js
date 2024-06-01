@@ -12,7 +12,7 @@ Coded by www.creative-tim.com
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
-
+import React, { useState } from "react";
 // react-router components
 import { Link } from "react-router-dom";
 
@@ -27,17 +27,17 @@ import MuiLink from "@mui/material/Link";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
+import { Grid } from "@mui/material";
 
 function SimpleBlogCard({ image, title, description, action }) {
   return (
-    <Card>
+    <Card style={{ boxShadow: "0 0 40px rgba(0, 0, 0, 0.45)", marginBottom: 75 }}>
       <MDBox position="relative" borderRadius="lg" mt={-3} mx={2}>
         <MDBox
           component="img"
           src={image}
           alt={title}
           borderRadius="lg"
-          shadow="md"
           width="100%"
           height="100%"
           position="relative"
@@ -45,7 +45,6 @@ function SimpleBlogCard({ image, title, description, action }) {
         />
         <MDBox
           borderRadius="lg"
-          shadow="md"
           width="100%"
           height="100%"
           position="absolute"
@@ -63,11 +62,9 @@ function SimpleBlogCard({ image, title, description, action }) {
         <MDTypography display="inline" variant="h3" textTransform="capitalize" fontWeight="bold">
           {title}
         </MDTypography>
-        <MDBox mt={2} mb={3}>
-          <MDTypography variant="body2" component="p" color="text">
-            {description}
-          </MDTypography>
-        </MDBox>
+        <MDTypography mt={1} mb={3} variant="body2" color="text" component="p">
+          {description}
+        </MDTypography>
         {action.type === "external" ? (
           <MuiLink href={action.route} target="_blank" rel="noreferrer">
             <MDButton color={action.color ? action.color : "dark"}>{action.label}</MDButton>

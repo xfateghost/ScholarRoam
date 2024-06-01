@@ -26,7 +26,7 @@ function configs(labels, datasets) {
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, 0.8)",
           data: datasets.data,
-          maxBarThickness: 6,
+          maxBarThickness: 30,
         },
       ],
     },
@@ -35,7 +35,7 @@ function configs(labels, datasets) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false,
+          display: true,
         },
       },
       interaction: {
@@ -48,13 +48,13 @@ function configs(labels, datasets) {
             drawBorder: false,
             display: true,
             drawOnChartArea: true,
-            drawTicks: false,
+            drawTicks: true,
             borderDash: [5, 5],
             color: "rgba(255, 255, 255, .2)",
           },
           ticks: {
             suggestedMin: 0,
-            suggestedMax: 500,
+            suggestedMax: 1000,
             beginAtZero: true,
             padding: 10,
             font: {
@@ -62,7 +62,7 @@ function configs(labels, datasets) {
               weight: 300,
               family: "Roboto",
               style: "normal",
-              lineHeight: 2,
+              lineHeight: 1,
             },
             color: "#fff",
           },
@@ -85,7 +85,7 @@ function configs(labels, datasets) {
               weight: 300,
               family: "Roboto",
               style: "normal",
-              lineHeight: 2,
+              lineHeight: 1,
             },
           },
         },

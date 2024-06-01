@@ -35,19 +35,19 @@ function TimelineList({ title, dark, children }) {
 
   return (
     <TimelineProvider value={dark}>
-      <Card>
+      <Card style={{ height: 717, overflowY: "auto", marginBottom: 75 }}>
         <MDBox
           bgColor={dark ? "dark" : "white"}
           variant="gradient"
           borderRadius="xl"
           sx={{ background: ({ palette: { background } }) => darkMode && background.card }}
         >
-          <MDBox pt={3} px={3}>
+          <MDBox pt={3} px={"2rem"}>
             <MDTypography variant="h6" fontWeight="medium" color={dark ? "white" : "dark"}>
               {title}
             </MDTypography>
           </MDBox>
-          <MDBox p={2}>{children}</MDBox>
+          <MDBox p={3}>{children}</MDBox>
         </MDBox>
       </Card>
     </TimelineProvider>

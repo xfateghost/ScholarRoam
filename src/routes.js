@@ -37,13 +37,16 @@ Coded by www.creative-tim.com
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
+import Budget from "layouts/tables";
+import Travel from "layouts/travel";
 import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import Itinerary from "layouts/itinerary";
+import Form from "layouts/form";
+import HomePage from "layouts/home";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -51,7 +54,7 @@ import Icon from "@mui/material/Icon";
 const routes = [
   {
     type: "collapse",
-    name: "Dashboard",
+    name: "ScholarHub",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
@@ -59,35 +62,19 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
+    name: "Expense Breakdown",
+    key: "expense-breakdown",
+    icon: <Icon fontSize="small">price_change</Icon>,
+    route: "/expense-breakdown",
+    component: <Budget />,
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
-  },
-  {
-    type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
-  },
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
+    name: "Travel Plan",
+    key: "travel",
+    icon: <Icon fontSize="small">airplane_ticket</Icon>,
+    route: "/travel",
+    component: <Itinerary />,
   },
   {
     type: "collapse",
@@ -112,6 +99,22 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+  },
+  {
+    type: "collapse",
+    name: "Form",
+    key: "form",
+    icon: <Icon fontSize="small">dynamic_form</Icon>,
+    route: "/sign-up/form",
+    component: <Form />,
+  },
+  {
+    type: "collapse",
+    name: "Home",
+    key: "home",
+    icon: <Icon fontSize="small">home</Icon>,
+    route: "/home",
+    component: <HomePage />,
   },
 ];
 

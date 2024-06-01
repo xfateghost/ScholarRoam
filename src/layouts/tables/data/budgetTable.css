@@ -1,0 +1,30 @@
+.ag-theme-quartz {
+    --ag-foreground-color: rgb(0, 0, 0);
+    --ag-background-color: rgb(0, 166, 255, 0.2);
+    --ag-header-foreground-color: rgb(0, 0, 0);
+    --ag-header-background-color: rgb(191, 0, 255, 0.20);
+    --ag-odd-row-background-color: rgba(0, 64, 255, 0.07);
+    --ag-header-column-resize-handle-color: rgba(126, 46, 132, 0.253);
+
+    --ag-font-size: 14px;
+    --ag-font-family: typography.font.family;
+}
+
+.ag-theme-quartz {
+    --ag-card-radius: 10px;
+    --ag-card-shadow: 0 10px 40px rgb(0, 0, 0, 0.5);
+    --ag-popup-shadow: var(--ag-card-shadow);
+    --ag-tab-min-width: 350px;
+}
+
+.ag-theme-quartz .ag-menu {
+    background-color: #ffffff;
+}
+
+.ag-theme-quartz .ag-tabs-header {
+    background-color: #ffffff;
+}
+
+.ag-theme-quartz .ag-tabs {
+    background-color: #ffffff;
+}

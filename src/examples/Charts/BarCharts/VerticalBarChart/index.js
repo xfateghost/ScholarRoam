@@ -43,7 +43,9 @@ import configs from "examples/Charts/BarCharts/VerticalBarChart/configs";
 
 // Material Dashboard 2 React base styles
 import colors from "assets/theme/base/colors";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
+ChartJS.register(ChartDataLabels);
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function VerticalBarChart({ icon, title, description, height, chart }) {
@@ -56,8 +58,8 @@ function VerticalBarChart({ icon, title, description, height, chart }) {
         backgroundColor: colors[dataset.color]
           ? colors[dataset.color || "dark"].main
           : colors.dark.main,
-        fill: false,
-        maxBarThickness: 35,
+        fill: true,
+        maxBarThickness: 50,
       }))
     : [];
 
