@@ -7,7 +7,7 @@ import Card from "@mui/material/Card";
 import PropTypes from "prop-types";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { Grow, Box, Select, MenuItem } from "@mui/material";
+import { Grow, Box, Select, MenuItem, Input } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
@@ -35,8 +35,11 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Switch from "@mui/material/Switch";
 import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Menu from "@mui/material/Menu";
 import { pink } from "@mui/material/colors";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import SaveIcon from "@mui/icons-material/Save";
+import { format, eachDayOfInterval } from "date-fns";
 
 import CityData from "./Data/CityData";
 import FoodData from "./Data/FoodData";
@@ -54,8 +57,17 @@ const DragIconButton = styled(IconButton)({
   transition: "visibility 0.1s, opacity 0.1s",
 });
 
+const SaveIconButton = styled(IconButton)({
+  visibility: "hidden",
+  transition: "visibility 0.1s, opacity 0.1s",
+});
+
 const ListItemWrapper = styled(ListItem)({
   "&:hover .delete-icon": {
+    visibility: "visible",
+    opacity: 1,
+  },
+  "&:hover .save-icon": {
     visibility: "visible",
     opacity: 1,
   },
@@ -71,8 +83,6 @@ const ListIconWrapper = styled(ListItem)({
     opacity: 1,
   },
 });
-
-const dayIndexArray = ["Friday, January 14th", "Saturday, January 15th", "Sunday, January 16th"];
 
 const citysuggestions = CityData();
 const foodsuggestions = FoodData();
@@ -95,24 +105,26 @@ const Options = ({ suggestions, dayIndex, checked, handleToggle, removeOption })
             <Grow in key={value} timeout={500} style={{ transitionDelay: `${delay}ms` }}>
               <ListItemWrapper key={index} role="listitem">
                 <ListItemButton
-                  key={value}
-                  role="listitem"
-                  onClick={() => handleToggle(value)}
-                  disableRipple
+                  onClick={() => {
+                    handleToggle(value);
+                    removeOption(index);
+                  }}
                 >
-                  <ListItemIcon>
-                    <Checkbox
-                      checked={checked.indexOf(value) !== -1}
-                      tabIndex={-1}
-                      disableRipple
+                  <Tooltip title="Save Suggestion">
+                    <SaveIconButton
+                      className="save-icon"
+                      aria-label="save"
                       sx={{
-                        color: pink[800],
-                        "&.Mui-checked": {
-                          color: pink[600],
+                        cursor: "pointer",
+                        color: "rgba(0, 0, 0, 0.8)",
+                        "&:hover": {
+                          color: "green",
                         },
                       }}
-                    />
-                  </ListItemIcon>
+                    >
+                      <SaveIcon />
+                    </SaveIconButton>
+                  </Tooltip>
                   <Card
                     style={{
                       width: "100%",
@@ -287,7 +299,6 @@ function CreateTask({ addTask, dayIndex }) {
             fontSize: 15,
             padding: "5px",
             marginBottom: "20px",
-            backgroundColor: "white",
           },
         }}
       />
@@ -305,9 +316,98 @@ export default function DynamicPlan() {
   const [activeChip, setActiveChip] = useState("City");
   const [cardBackgroundColor, setCardBackgroundColor] = useState("rgba(255, 128, 0, 0.10)");
   const [open, setOpen] = useState(false);
-  const [trip, setTrip] = React.useState("Madrid");
   const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
   const [checkedState, setCheckedState] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [trips, setTrips] = useState([]);
+  const [selectedTrip, setSelectedTrip] = useState([]);
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    return today.toISOString().substr(0, 10);
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const today = new Date();
+    const defaultEndDate = new Date(today);
+    defaultEndDate.setDate(defaultEndDate.getDate() + 4);
+    return defaultEndDate.toISOString().substr(0, 10);
+  });
+  const [dayIndexArray, setDayIndexArray] = useState([]);
+  const [shortDateArray, setShortDateArray] = useState([]);
+  const [shortDateRange, setShortDateRange] = useState([]);
+  const [cityArray, setCityArray] = useState(["Madrid"]);
+  const [activeTrip, setActiveTrip] = useState(cityArray[0]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [textValue, setTextValue] = useState(activeTrip);
+  const [tempSelectedCity, setTempSelectedCity] = useState("");
+  const [tempDateRange, setTempDateRange] = useState({ startDate: "", endDate: "" });
+
+  const updateDayIndexArrayForActiveTrip = (start, end) => {
+    setDayIndexArray((prevDayIndexArray) => {
+      const datesArray = eachDayOfInterval({ start, end }).map((date) => ({
+        fullDate: format(date, "EEEE, MMMM do"),
+      }));
+      const newDayIndexArray = datesArray.map((date) => date.fullDate);
+      return {
+        ...prevDayIndexArray,
+        [activeTrip]: newDayIndexArray,
+      };
+    });
+  };
+
+  const updateShortDateRangeForActiveTrip = (start, end) => {
+    setShortDateRange((prevShortDateRange) => {
+      const datesArray = eachDayOfInterval({ start, end }).map((date) => ({
+        shortRange: format(date, "M/d"),
+      }));
+      const newShortDateRange = datesArray.map((date) => date.shortRange);
+      return {
+        ...prevShortDateRange,
+        [activeTrip]: newShortDateRange,
+      };
+    });
+  };
+
+  const updateShortDateArrayForActiveTrip = (start, end) => {
+    setShortDateArray((prevShortDateArray) => {
+      const datesArray = eachDayOfInterval({ start, end }).map((date) => ({
+        shortDate: format(date, "M/d"),
+      }));
+      const newShortDateArray = datesArray.map((date) => date.shortDate);
+      return {
+        ...prevShortDateArray,
+        [activeTrip]: newShortDateArray,
+      };
+    });
+  };
+
+  const handleDateChange = (start, end) => {
+    if (start && end && activeTrip) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+
+      if (endDate <= startDate) {
+        console.error("End date must be greater than start date");
+        return;
+      }
+
+      updateDayIndexArrayForActiveTrip(startDate, endDate);
+      updateShortDateArrayForActiveTrip(startDate, endDate);
+      updateShortDateRangeForActiveTrip(startDate, endDate);
+    }
+  };
+
+  React.useEffect(() => {
+    handleDateChange(startDate, endDate);
+  }, []);
+
+  const getLabelForActiveTrip = () => {
+    const dates = shortDateRange[activeTrip];
+    if (dates && dates.length > 0) {
+      return `${dates[0]} to ${dates[dates.length - 1]}`;
+    }
+    return "";
+  };
 
   const ActiveSuggestions = (activeChip) => {
     switch (activeChip) {
@@ -324,10 +424,11 @@ export default function DynamicPlan() {
 
   const getSuggestionsForDays = (chunkIndex, activeChip) => {
     const activeSuggestions = ActiveSuggestions(activeChip);
-    return dayIndexArray.map((_, dayIndex) => {
+    const activeTripDayIndexArray = dayIndexArray[activeTrip] || [];
+    return activeTripDayIndexArray.map((_, dayIndex) => {
       const startIndex =
-        ((chunkIndex * dayIndexArray.length + dayIndex) * 5) % activeSuggestions.length;
-      const endIndex = startIndex + 5;
+        ((chunkIndex * activeTripDayIndexArray.length + dayIndex) * 3) % activeSuggestions.length;
+      const endIndex = startIndex + 3;
       return activeSuggestions.slice(startIndex, endIndex);
     });
   };
@@ -336,7 +437,7 @@ export default function DynamicPlan() {
     getSuggestionsForDays(currentChunkIndex)
   );
 
-  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const toggleSuggestions = () => {
     setShowSuggestions(!showSuggestions);
@@ -346,35 +447,18 @@ export default function DynamicPlan() {
     if (showSuggestions) {
       setDisplayedSuggestions(getSuggestionsForDays(currentChunkIndex, activeChip));
     } else {
-      const filtered = displaySuggestions.map((daySuggestions) =>
-        daySuggestions.filter((suggestion) => checkedState[activeChip]?.includes(suggestion))
-      );
-      setDisplayedSuggestions(filtered);
+      setDisplayedSuggestions(!showSuggestions);
     }
   }, [showSuggestions, currentChunkIndex, activeChip]);
 
   const refreshSuggestions = () => {
     const activeSuggestions = ActiveSuggestions(activeChip);
+    const activeTripDayIndexArray = dayIndexArray[activeTrip] || [];
     const nextChunkIndex =
-      (currentChunkIndex + 1) % Math.ceil(activeSuggestions.length / (dayIndexArray.length * 5));
+      (currentChunkIndex + 1) %
+      Math.ceil(activeSuggestions.length / (activeTripDayIndexArray.length * 5));
     setCurrentChunkIndex(nextChunkIndex);
     setDisplayedSuggestions(getSuggestionsForDays(nextChunkIndex, activeChip));
-  };
-
-  const handleToggle = (value) => {
-    setCheckedState((prevState) => {
-      const currentChecked = prevState[activeChip] || [];
-      const currentIndex = currentChecked.indexOf(value);
-      const newChecked = [...currentChecked];
-
-      if (currentIndex === -1) {
-        newChecked.push(value);
-      } else {
-        newChecked.splice(currentIndex, 1);
-      }
-
-      return { ...prevState, [activeChip]: newChecked };
-    });
   };
 
   const removeOption = (dayIndex, suggestionIndex) => {
@@ -397,28 +481,81 @@ export default function DynamicPlan() {
 
   const handleAddTask = (newTask, dayIndex) => {
     setTasks((prevTasks) => {
-      const chipTasks = prevTasks[activeChip] || {};
+      const cityTasks = prevTasks[activeTrip] || {};
+      const chipTasks = cityTasks[activeChip] || {};
       const dayTasks = chipTasks[dayIndex] || [];
       return {
         ...prevTasks,
-        [activeChip]: {
-          ...chipTasks,
-          [dayIndex]: [...dayTasks, { title: newTask, completed: false }],
+        [activeTrip]: {
+          ...prevTasks[activeTrip],
+          [activeChip]: {
+            ...prevTasks[activeTrip]?.[activeChip],
+            [dayIndex]: [...dayTasks, { title: newTask, completed: false }],
+          },
         },
       };
     });
   };
 
+  const handleToggle = (value, newTask, dayIndex) => {
+    setCheckedState((prevState) => {
+      const currentChecked = prevState[activeChip] || [];
+      const currentIndex = currentChecked.indexOf(value);
+      const newChecked = [...currentChecked];
+      if (currentIndex === -1) {
+        newChecked.push(value);
+        setTasks((prevTasks) => {
+          const cityTasks = prevTasks[activeTrip] || {};
+          const chipTasks = cityTasks[activeChip] || {};
+          const dayTasks = chipTasks[dayIndex] || [];
+          return {
+            ...prevTasks,
+            [activeTrip]: {
+              ...prevTasks[activeTrip],
+              [activeChip]: {
+                ...prevTasks[activeTrip]?.[activeChip],
+                [dayIndex]: [...dayTasks, { title: newTask, completed: false }],
+              },
+            },
+          };
+        });
+      } else {
+        newChecked.splice(currentIndex, 1);
+        setTasks((prevTasks) => {
+          const cityTasks = prevTasks[activeTrip] || {};
+          const chipTasks = cityTasks[activeChip] || {};
+          const dayTasks = chipTasks[dayIndex] || [];
+          const updatedDayTasks = dayTasks.filter((task) => task.title !== newTask);
+          return {
+            ...prevTasks,
+            [activeTrip]: {
+              ...prevTasks[activeTrip],
+              [activeChip]: {
+                ...prevTasks[activeTrip]?.[activeChip],
+                [dayIndex]: updatedDayTasks,
+              },
+            },
+          };
+        });
+      }
+      return { ...prevState, [activeChip]: newChecked };
+    });
+  };
+
   const removeTask = (dayIndex, taskIndex) => {
     setTasks((prevTasks) => {
-      const chipTasks = prevTasks[activeChip] || {};
+      const cityTasks = prevTasks[activeTrip] || {};
+      const chipTasks = cityTasks[activeChip] || {};
       const dayTasks = chipTasks[dayIndex] || [];
       dayTasks.splice(taskIndex, 1);
       return {
         ...prevTasks,
-        [activeChip]: {
-          ...chipTasks,
-          [dayIndex]: dayTasks,
+        [activeTrip]: {
+          ...prevTasks[activeTrip],
+          [activeChip]: {
+            ...prevTasks[activeTrip]?.[activeChip],
+            [dayIndex]: dayTasks,
+          },
         },
       };
     });
@@ -441,18 +578,26 @@ export default function DynamicPlan() {
     }
   };
 
+  const cityBgColors = {
+    Madrid: "rgba(255, 215, 0, 0.8)", // Bold gold
+    Vienna: "rgba(34, 139, 34, 0.8)", // Bold forest green
+    London: "rgba(123, 104, 238, 0.8)", // Bold medium slate blue
+    Paris: "rgba(220, 20, 60, 0.8)", // Bold crimson
+    Munich: "rgba(30, 144, 255, 0.8)", // Bold dodger blue
+  };
+
+  const defaultBgColor = "rgba(169, 169, 169, 0.8)";
+
+  const getHeaderBackgroundColor = (activeTrip) => {
+    return cityBgColors[activeTrip] || defaultBgColor;
+  };
+
   const handleClickOpen = () => {
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const handleChange = (event) => {
-    const selectedValue = event.target.value;
-    setTrip(selectedValue);
-    console.log(selectedValue);
   };
 
   const getItemStyle = (isDragging, draggableStyle) => ({
@@ -480,76 +625,228 @@ export default function DynamicPlan() {
         return;
       }
 
-      const dayIndex = result.source.droppableId;
-      const reorderedTasks = reorder(
-        tasks[activeChip][dayIndex] || [],
-        result.source.index,
-        result.destination.index
-      );
+      const sourceDayIndex = result.source.droppableId;
+      const destinationDayIndex = result.destination.droppableId;
 
-      setTasks((prevTasks) => ({
-        ...prevTasks,
-        [activeChip]: {
-          ...prevTasks[activeChip],
-          [dayIndex]: reorderedTasks,
-        },
-      }));
+      if (sourceDayIndex === destinationDayIndex) {
+        const reorderedTasks = reorder(
+          tasks[activeTrip][activeChip][sourceDayIndex],
+          result.source.index,
+          result.destination.index
+        );
+
+        setTasks((prevTasks) => ({
+          ...prevTasks,
+          [activeTrip]: {
+            ...prevTasks[activeTrip],
+            [activeChip]: {
+              ...prevTasks[activeTrip][activeChip],
+              [sourceDayIndex]: reorderedTasks,
+            },
+          },
+        }));
+      } else {
+        const sourceTasks = tasks[activeTrip][activeChip][sourceDayIndex] || [];
+        const destinationTasks = tasks[activeTrip][activeChip][destinationDayIndex] || [];
+
+        const [removedTask] = sourceTasks.splice(result.source.index, 1);
+        destinationTasks.splice(result.destination.index, 0, removedTask);
+
+        setTasks((prevTasks) => ({
+          ...prevTasks,
+          [activeTrip]: {
+            ...prevTasks[activeTrip],
+            [activeChip]: {
+              ...prevTasks[activeTrip][activeChip],
+              [sourceDayIndex]: sourceTasks,
+              [destinationDayIndex]: destinationTasks,
+            },
+          },
+        }));
+      }
     },
-    [tasks, activeChip]
+    [tasks, activeTrip, activeChip]
   );
+
+  const handleEnterCity = (city) => {
+    setTempSelectedCity(city);
+    setActiveTrip(city);
+    console.log(city);
+  };
+
+  React.useEffect(() => {
+    validateForm();
+  }, [selectedTrip]);
+
+  const validateForm = () => {
+    setIsFormValid(true);
+  };
+
+  const handleDateEnterForm = (startDate, endDate) => {
+    setTempDateRange({ startDate, endDate });
+    console.log(startDate, endDate);
+  };
+
+  const handleDateEnter = (startDate, endDate) => {
+    setSelectedTrip((prev) => ({ ...prev, dateRange: { startDate, endDate } }));
+    console.log(startDate, endDate);
+    handleDateChange(startDate, endDate);
+  };
+
+  const handleEnter = () => {
+    const { startDate, endDate } = tempDateRange;
+    if (!tempSelectedCity || !startDate || !endDate) {
+      console.error("City or date range are not selected.");
+      return;
+    }
+
+    const updatedCityArray = [...cityArray, tempSelectedCity];
+    setCityArray(updatedCityArray);
+
+    setSelectedTrip((prev) => [...prev, { dateRange: { startDate, endDate } }]);
+
+    handleDateChange(startDate, endDate);
+
+    console.log("Data entered:", { city: tempSelectedCity, dateRange: tempDateRange });
+
+    setTempSelectedCity("");
+    setTempDateRange({ startDate: "", endDate: "" });
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openCard = Boolean(anchorEl);
+  const handleClickCard = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseCard = () => {
+    setAnchorEl(null);
+  };
+
+  React.useEffect(() => {
+    setTextValue(activeTrip);
+  }, [activeTrip]);
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleChange = (event) => {
+    setTextValue(event.target.value);
+  };
+
+  const handleBlur = () => {
+    const updatedCityArray = [...cityArray];
+
+    const index = updatedCityArray.indexOf(activeTrip);
+
+    if (index !== -1) {
+      updatedCityArray.splice(index, 1, textValue);
+      setCityArray(updatedCityArray);
+      setActiveTrip(textValue);
+    }
+
+    setSelectedTrip((prev) => [...prev, { [activeTrip]: { startDate, endDate } }]);
+
+    handleDateChange(startDate, endDate);
+
+    console.log(textValue, startDate, endDate);
+
+    setIsEditing(false);
+  };
+
+  const handleTripChange = (city) => {
+    setActiveTrip(city);
+  };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <Box sx={{ display: "flex", marginLeft: -6.6 }}>
+        <FancyPag
+          dayIndexArray={dayIndexArray[activeTrip] || []}
+          shortDateArray={shortDateArray[activeTrip] || []}
+          bgColor={getHeaderBackgroundColor(activeTrip)}
+        />
+      </Box>
       <div className="card-container">
         <Card
           sx={{
-            backgroundColor: "lightblue",
+            backgroundColor: getHeaderBackgroundColor(activeTrip),
             borderRadius: "8px 8px 0px 0px",
             boxShadow: "none",
             padding: "0.5rem",
             paddingBottom: "0.7rem",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             flexDirection: "row",
           }}
         >
-          <Chip color="primary" label="1/14 to 1/16" sx={{ fontSize: "1rem" }} />
+          <div>
+            <Chip
+              id="day-chip"
+              aria-controls={open ? "chip-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              onClick={handleClickCard}
+              color="primary"
+              label={getLabelForActiveTrip()}
+              sx={{ fontSize: "1rem" }}
+            />
+            <Menu
+              id="chip-menu"
+              anchorEl={anchorEl}
+              open={openCard}
+              onClose={handleCloseCard}
+              MenuListProps={{
+                "aria-labelledby": "day-chip",
+              }}
+              PaperProps={{
+                style: {
+                  width: "350px",
+                  height: "450px",
+                },
+              }}
+            >
+              <EditCard onFullDateEnter={handleDateEnter} />
+            </Menu>
+          </div>
           <FormControl
             focused
+            noValidate
+            autoComplete="off"
             variant="standard"
-            style={{ minWidth: 150, textAlign: "center", marginLeft: "5em" }}
+            style={{ minWidth: 150, textAlign: "center", marginLeft: "7em" }}
+            onDoubleClick={handleDoubleClick}
           >
-            <Select value={trip} onChange={handleChange} displayEmpty>
-              <MenuItem value={"Madrid"}>
-                <Typography>Madrid</Typography>
-              </MenuItem>
-              <MenuItem value={"Vienna"}>
-                <Typography>Vienna</Typography>
-              </MenuItem>
-              <MenuItem value={"London"}>
-                <Typography>London</Typography>
-              </MenuItem>
-              <MenuItem value={"Paris"}>
-                <Typography>Paris</Typography>
-              </MenuItem>
-              <MenuItem value={"Munich"}>
-                <Typography>Munich</Typography>
-              </MenuItem>
-              <MenuItem value={"Brussels"}>
-                <Typography>Brussels</Typography>
-              </MenuItem>
-              <MenuItem value={"Stockholm"}>
-                <Typography>Stockholm</Typography>
-              </MenuItem>
-              <MenuItem value={"Add new"}>
-                <Typography>Add new</Typography>
-              </MenuItem>
-            </Select>
+            {isEditing ? (
+              <TextField
+                variant="standard"
+                value={textValue}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                autoFocus
+                sx={{
+                  marginRight: "8.6em",
+                  marginTop: "7px",
+                  "& .MuiInputBase-input": {
+                    textAlign: "center",
+                    fontSize: "1.5em",
+                  },
+                }}
+              />
+            ) : (
+              <Select value={activeTrip} displayEmpty>
+                {cityArray.map((city) => (
+                  <MenuItem key={city} value={city} onClick={() => handleTripChange(city)}>
+                    <Typography>{city}</Typography>
+                  </MenuItem>
+                ))}
+                <MenuItem value={"Add new"} onClick={handleClickOpen}>
+                  <Typography>Add new</Typography>
+                </MenuItem>
+              </Select>
+            )}
           </FormControl>
-          <IconButton sx={{ marginLeft: "auto" }} onClick={handleClickOpen}>
-            <Edit />
-          </IconButton>
         </Card>
         <nav style={{ position: "sticky", top: 0 }}>
           <Card
@@ -576,11 +873,11 @@ export default function DynamicPlan() {
                     variant="outlined"
                     icon={
                       chip === "City" ? (
-                        <LocationCityIcon />
+                        <LocationCityIcon sx={{ fontSize: "15px" }} />
                       ) : chip === "Food" ? (
-                        <LunchDiningIcon />
+                        <LunchDiningIcon sx={{ fontSize: "15px" }} />
                       ) : (
-                        <LocalBarIcon />
+                        <LocalBarIcon sx={{ fontSize: "15px" }} />
                       )
                     }
                     style={{
@@ -602,7 +899,7 @@ export default function DynamicPlan() {
                 label="Refresh Suggestions"
                 clickable
                 variant="outlined"
-                icon={<RefreshIcon />}
+                icon={<RefreshIcon fontSize="small" />}
                 style={{
                   width: "13em",
                   backgroundColor: "lightgreen",
@@ -610,7 +907,7 @@ export default function DynamicPlan() {
                 onClick={refreshSuggestions}
               />
               <Tooltip title="Toggle Suggestions">
-                <Switch defaultChecked={displaySuggestions} onChange={toggleSuggestions} />
+                <Switch defaultChecked={false} onChange={toggleSuggestions} />
               </Tooltip>
             </Stack>
           </Card>
@@ -618,31 +915,20 @@ export default function DynamicPlan() {
         <Card
           className="pa3 card"
           style={{
-            maxHeight: "30em",
+            maxHeight: "68.2vh",
             overflowY: "auto",
             width: "31em",
-            height: "30em",
+            height: "68.2vh",
             borderRadius: "0px 0px 8px 8px",
             backgroundColor: getCardBackgroundColor(activeChip),
           }}
         >
           <List sx={{ width: "100%", fontSize: "5px" }}>
-            {dayIndexArray.map((dayIndex, dayIndexNumber) => (
+            {dayIndexArray[activeTrip]?.map((dayIndex, dayIndexNumber) => (
               <React.Fragment key={dayIndex}>
-                <Typography variant="h6" style={{ marginTop: "1px" }}>
+                <Typography variant="h6" id={dayIndex} style={{ marginTop: "1px" }}>
                   {dayIndex}
                 </Typography>
-                <CreateTask addTask={handleAddTask} dayIndex={dayIndex} />
-                <Options
-                  key={dayIndex}
-                  suggestions={displaySuggestions[dayIndexNumber]}
-                  dayIndex={dayIndexNumber}
-                  checked={checkedState[activeChip] || []}
-                  handleToggle={handleToggle}
-                  removeOption={(suggestionIndex) =>
-                    removeOption(currentChunkIndex, suggestionIndex)
-                  }
-                />
                 <Droppable droppableId={dayIndex} key={dayIndex}>
                   {(provided, snapshot) => (
                     <div
@@ -650,48 +936,62 @@ export default function DynamicPlan() {
                       ref={provided.innerRef}
                       style={getListStyle(snapshot.isDraggingOver)}
                     >
+                      <CreateTask addTask={handleAddTask} dayIndex={dayIndex} />
+                      <Options
+                        suggestions={displaySuggestions[dayIndexNumber] || []}
+                        dayIndex={dayIndexNumber}
+                        checked={checkedState[activeChip] || []}
+                        handleToggle={(value) => handleToggle(value, value, dayIndex)}
+                        removeOption={(suggestionIndex) =>
+                          removeOption(dayIndexNumber, suggestionIndex)
+                        }
+                      />
                       <TransitionGroup>
-                        {(tasks[activeChip]?.[dayIndex] || []).map((task, taskIndex) => (
-                          <Grow key={taskIndex}>
-                            <ListItem key={taskIndex} disablePadding>
-                              <Draggable
-                                key={taskIndex}
-                                draggableId={`${dayIndex}-${taskIndex}`}
-                                index={taskIndex}
-                              >
-                                {(provided, snapshot) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={getItemStyle(
-                                      snapshot.isDragging,
-                                      provided.draggableProps.style
-                                    )}
-                                  >
-                                    <ListItemText
-                                      primary={
-                                        <Task
-                                          task={task}
-                                          index={taskIndex}
-                                          tasks={tasks[activeChip][dayIndex]}
-                                          removeTask={() => removeTask(dayIndex, taskIndex)}
-                                        />
-                                      }
-                                      primaryTypographyProps={{
-                                        color: "primary",
-                                        fontWeight: "medium",
-                                        variant: "body2",
-                                      }}
-                                    />
-                                  </div>
-                                )}
-                              </Draggable>
-                            </ListItem>
-                          </Grow>
-                        ))}
-                        {provided.placeholder}
+                        {(tasks[activeTrip]?.[activeChip]?.[dayIndex] || []).map(
+                          (task, taskIndex) => (
+                            <Grow key={taskIndex}>
+                              <ListItem key={taskIndex} disablePadding>
+                                <Draggable
+                                  key={`${dayIndex}-${taskIndex}`}
+                                  draggableId={`${dayIndex}-${taskIndex}`}
+                                  index={taskIndex}
+                                >
+                                  {(provided, snapshot) => (
+                                    <div
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      style={getItemStyle(
+                                        snapshot.isDragging,
+                                        provided.draggableProps.style
+                                      )}
+                                    >
+                                      <ListItemText
+                                        primary={
+                                          <Task
+                                            task={task}
+                                            index={taskIndex}
+                                            tasks={
+                                              tasks[activeTrip]?.[activeChip]?.[dayIndex] || []
+                                            }
+                                            removeTask={() => removeTask(dayIndex, taskIndex)}
+                                          />
+                                        }
+                                        primaryTypographyProps={{
+                                          color: "primary",
+                                          fontWeight: "medium",
+                                          variant: "body2",
+                                        }}
+                                      />
+                                    </div>
+                                  )}
+                                </Draggable>
+                              </ListItem>
+                            </Grow>
+                          )
+                        )}
                       </TransitionGroup>
+                      {provided.placeholder}
                     </div>
                   )}
                 </Droppable>
@@ -704,8 +1004,11 @@ export default function DynamicPlan() {
           description="Here you can edit the name of your city as well as your travel dates."
           textlabel="City"
           open={open}
+          onInput={handleEnterCity}
           handleClose={handleClose}
-          component={<EditCard />}
+          isFormValid={isFormValid}
+          onEnter={handleEnter}
+          component={<EditCard onFullDateEnter={handleDateEnterForm} />}
           showTextField={true}
         />
       </div>

@@ -13,171 +13,42 @@ import Typography from "@mui/material/Typography";
 import { Card } from "@mui/material";
 import MDBox from "components/MDBox";
 import { Grid } from "@mui/material";
+import PropTypes from "prop-types";
 
-function BudgetTimeline() {
+const BudgetTimeline = ({ budget, index }) => {
+  const { icon, title, amount } = budget;
   return (
-    <Card style={{ maxHeight: "400px", height: "100%", overflowY: "auto" }}>
-      <MDBox>
-        <Grid>
-          <Timeline position="left">
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $10
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <FastfoodIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Food
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $5
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <LaptopMacIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Museum
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $300
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <HotelIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Flight
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $40
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <RepeatIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Shopping
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $40
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <RepeatIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Shopping
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $40
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <RepeatIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Shopping
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $40
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <RepeatIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Shopping
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $40
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <RepeatIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Shopping
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
-                $40
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <RepeatIcon />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: "18px", px: 2 }}>
-                <Typography variant="h6" component="span">
-                  Shopping
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-          </Timeline>
-        </Grid>
-      </MDBox>
+    <Card style={{ maxHeight: "400px", width: "100%", overflowY: "auto" }}>
+      <Grid>
+        <Timeline position="left">
+          <TimelineItem key={index}>
+            <TimelineOppositeContent sx={{ m: "auto 0" }} align="right" variant="h6">
+              ${amount}
+            </TimelineOppositeContent>
+            <TimelineSeparator>
+              <TimelineConnector />
+              <TimelineDot color="primary">{icon}</TimelineDot>
+              <TimelineConnector />
+            </TimelineSeparator>
+            <TimelineContent sx={{ py: "18px", px: 2 }}>
+              <Typography variant="h6" component="div">
+                {title}
+              </Typography>
+            </TimelineContent>
+          </TimelineItem>
+        </Timeline>
+      </Grid>
     </Card>
   );
-}
+};
+
+BudgetTimeline.propTypes = {
+  budget: PropTypes.shape({
+    icon: PropTypes.element.isRequired,
+    amount: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+};
 
 export default BudgetTimeline;

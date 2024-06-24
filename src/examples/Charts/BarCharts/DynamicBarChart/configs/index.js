@@ -1,26 +1,6 @@
-/**
-=========================================================
-* Material Dashboard 2  React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// Material Dashboard 2 React base styles
 import typography from "assets/theme/base/typography";
 
-const newLabelClickHandler = function () {
-  console.log("Click!");
-};
-
-function configs(labels, datasets) {
+function configs(labels, datasets, onChartChange) {
   return {
     data: {
       labels,
@@ -48,15 +28,31 @@ function configs(labels, datasets) {
         dragData: {
           round: 0,
           showTooltip: true,
+          dragDate: true,
           onDragStart: function (e) {
             console.log(e);
           },
           onDrag: function (e, datasetIndex, index, value) {
             console.log(e, datasetIndex, index, value);
+            const chart = value.chart;
+            if (chart && chart.scales && chart.scales.y) {
+              const yAxis = chart.scales.y;
+              const currentMax = yAxis.max;
+              const margin = 50;
+
+              if (value >= currentMax - margin) {
+                const newMax = Math.ceil(value / 100) * 100;
+                yAxis.options.max = newMax;
+                chart.update();
+              }
+            }
           },
           onDragEnd: function (e, datasetIndex, index, value) {
-            e.target.style.cursor = "defaut";
-            console.log(datasetIndex, index, value);
+            e.target.style.cursor = "default";
+            if (onChartChange) {
+              onChartChange(value);
+            }
+            console.log("value:", value);
           },
         },
         layout: {
@@ -93,55 +89,6 @@ function configs(labels, datasets) {
             title: "",
             value: {
               color: "black",
-            },
-          },
-          listeners: {
-            enter: function (context) {
-              context.hovered = true;
-              return true;
-            },
-            leave: function (context) {
-              context.hovered = false;
-              return true;
-            },
-            click: function (context) {
-              const dataIndex = context.dataIndex;
-              const datasetIndex = context.datasetIndex;
-              const label = context.chart.data.labels[dataIndex];
-              const position = context.chart
-                .getDatasetMeta(0)
-                .data[context.dataIndex].getCenterPoint();
-              const input = document.createElement("input");
-              input.type = "number";
-              input.value = context.chart.data.datasets[datasetIndex].data[dataIndex];
-              input.style.position = "absolute";
-              input.style.top = position.y + "px";
-              input.style.left = position.x + 200 + "px";
-              input.style.zIndex = 100;
-              document.body.appendChild(input);
-              input.focus();
-              input.addEventListener("blur", () => {
-                setTimeout(() => {
-                  if (input.parentNode) {
-                    context.chart.data.datasets[datasetIndex].data[dataIndex] = parseFloat(
-                      input.value
-                    );
-                    input.parentNode.removeChild(input);
-                    context.chart.update();
-                  }
-                }, 0);
-              });
-              input.addEventListener("keydown", (event) => {
-                setTimeout(() => {
-                  if (event.key === "Enter") {
-                    context.chart.data.datasets[datasetIndex].data[dataIndex] = parseFloat(
-                      input.value
-                    );
-                    input.parentNode.removeChild(input);
-                    context.chart.update();
-                  }
-                }, 0);
-              });
             },
           },
         },

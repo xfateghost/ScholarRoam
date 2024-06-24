@@ -19,7 +19,14 @@ function configs(labels, datasets) {
   return {
     data: {
       labels,
-      datasets: [...datasets],
+      datasets: datasets.map((dataset) => ({
+        ...dataset,
+        weight: 5,
+        borderWidth: 0,
+        borderRadius: 4,
+        fill: true,
+        maxBarThickness: 60,
+      })),
     },
     options: {
       indexAxis: "y",
@@ -27,22 +34,57 @@ function configs(labels, datasets) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: true,
+          display: false,
+        },
+        datalabels: {
+          formatter: function (value) {
+            return value.toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            });
+          },
+          display: function (context) {
+            return context.active || context.dataset.data[context.dataIndex] != null;
+          },
+          anchor: "center",
+          align: "center",
+          font: {
+            size: "12.5",
+            family: typography.fontFamily,
+            style: "normal",
+            weight: "bold",
+          },
+          borderWidth: 1,
+          borderRadius: 5,
+          padding: 1.5,
+          borderColor: function (context) {
+            return context.hovered ? "black" : "white";
+          },
+          backgroundColor: "white",
+          labels: {
+            title: "",
+            value: {
+              color: "black",
+            },
+          },
         },
       },
       scales: {
         y: {
+          stacked: true,
           grid: {
             drawBorder: false,
             display: true,
-            drawOnChartArea: true,
+            drawOnChartArea: false,
             drawTicks: false,
             borderDash: [5, 5],
             color: "#c1c4ce5c",
           },
           ticks: {
             display: true,
-            color: "#b2b9bf",
+            color: "black",
             padding: 10,
             font: {
               size: 11,
@@ -53,7 +95,9 @@ function configs(labels, datasets) {
           },
         },
         x: {
+          stacked: true,
           grid: {
+            stacked: true,
             drawBorder: false,
             display: false,
             drawOnChartArea: true,
@@ -62,7 +106,7 @@ function configs(labels, datasets) {
           },
           ticks: {
             display: true,
-            color: "#b2b9bf",
+            color: "black",
             padding: 20,
             font: {
               size: 11,

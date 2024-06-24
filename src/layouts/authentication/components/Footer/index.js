@@ -59,7 +59,7 @@ function Footer({ light }) {
             by
             <Link href="https://www.creative-tim.com/" target="_blank">
               <MDTypography variant="button" fontWeight="medium" color={light ? "white" : "dark"}>
-                &nbsp;ScholarRoam&nbsp;
+                &nbsp;ScholarRoam.io&nbsp;
               </MDTypography>
             </Link>
           </MDBox>
@@ -81,18 +81,18 @@ function Footer({ light }) {
             })}
           >
             <MDBox component="li" pr={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/" target="_blank">
+              <Link href="https://github.com/xfateghost/ScholarRoam" target="_blank">
                 <MDTypography
                   variant="button"
                   fontWeight="regular"
                   color={light ? "white" : "dark"}
                 >
-                  ScholarRoam
+                  ScholarRoam.io
                 </MDTypography>
               </Link>
             </MDBox>
             <MDBox component="li" px={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/presentation" target="_blank">
+              <Link href="https://github.com/xfateghost/ScholarRoam" target="_blank">
                 <MDTypography
                   variant="button"
                   fontWeight="regular"
@@ -103,7 +103,7 @@ function Footer({ light }) {
               </Link>
             </MDBox>
             <MDBox component="li" px={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/blog" target="_blank">
+              <Link href="https://github.com/xfateghost/ScholarRoam" target="_blank">
                 <MDTypography
                   variant="button"
                   fontWeight="regular"
@@ -114,7 +114,7 @@ function Footer({ light }) {
               </Link>
             </MDBox>
             <MDBox component="li" pl={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/license" target="_blank">
+              <Link href="https://github.com/xfateghost/ScholarRoam" target="_blank">
                 <MDTypography
                   variant="button"
                   fontWeight="regular"

@@ -1,17 +1,3 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
 import React, { useState } from "react";
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -27,39 +13,39 @@ import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatist
 import VerticalBarChart from "examples/Charts/BarCharts/VerticalBarChart";
 import TripLog from "examples/TripLog";
 import DynamicBarChart from "examples/Charts/BarCharts/DynamicBarChart";
-import { Card } from "@mui/material";
+import { Card, Box } from "@mui/material";
 import MDTypography from "components/MDTypography";
 import BudgetGoal from "examples/BudgetGoal";
 
 function Dashboard() {
+  const [budget, setBudget] = useState(8500);
+
+  const [totalBudget, setTotalBudget] = useState(8500);
+
+  const handleChartChange = (value) => {
+    console.log("Received value from chart:", value);
+    const chartDataSum = chartData.datasets.reduce((sum, dataset) => {
+      return sum + dataset.data.reduce((datasetSum, data) => datasetSum + data, 0);
+    }, 0);
+    const newTotalBudget = chartDataSum + value;
+    setTotalBudget(newTotalBudget);
+  };
+
   const [chartData, setChartData] = useState({
     labels: ["Travel", "Lodging", "Food", "Shopping", "Nightlife", "Misc.", "Discretionary"],
     datasets: [
       {
         label: "$",
-        data: [977, 1189, 1665, 570, 394, 150, 300],
+        data: [
+          8500 * 0.15,
+          8500 * 0.2,
+          8500 * 0.3,
+          8500 * 0.1,
+          8500 * 0.1,
+          8500 * 0.05,
+          8500 * 0.1,
+        ],
         backgroundColor: [
-          "rgba(255, 99, 132)",
-          "rgba(255, 159, 64)",
-          "rgba(255, 205, 86)",
-          "rgba(75, 192, 192)",
-          "rgba(54, 162, 235)",
-          "rgba(153, 102, 255)",
-          "rgba(201, 203, 207)",
-          "rgba(255, 99, 132)",
-          "rgba(255, 159, 64)",
-          "rgba(255, 205, 86)",
-          "rgba(75, 192, 192)",
-          "rgba(54, 162, 235)",
-          "rgba(153, 102, 255)",
-          "rgba(201, 203, 207)",
-          "rgba(255, 99, 132)",
-          "rgba(255, 159, 64)",
-          "rgba(255, 205, 86)",
-          "rgba(75, 192, 192)",
-          "rgba(54, 162, 235)",
-          "rgba(153, 102, 255)",
-          "rgba(201, 203, 207)",
           "rgba(255, 99, 132)",
           "rgba(255, 159, 64)",
           "rgba(255, 205, 86)",
@@ -72,14 +58,38 @@ function Dashboard() {
     ],
   });
 
+  const handleValueChange = (newValue) => {
+    setTotalBudget(newValue);
+
+    const updatedData = [
+      newValue * 0.15, // Travel
+      newValue * 0.2, // Lodging
+      newValue * 0.3, // Food
+      newValue * 0.1, // Shopping
+      newValue * 0.1, // Nightlife
+      newValue * 0.05, // Misc.
+      newValue * 0.1, // Discretionary
+    ];
+
+    setChartData({
+      ...chartData,
+      datasets: [
+        {
+          ...chartData.datasets[0],
+          data: updatedData,
+        },
+      ],
+    });
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={1}>
-        <BudgetGoal />
+        <BudgetGoal totalBudget={totalBudget} budget={budget} onValueChange={handleValueChange} />
         <MDBox mt={3.5}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={29} lg={8}>
+            <Grid item xs={12} md={8} lg={8}>
               <MDBox mb={5}>
                 <DynamicBarChart
                   icon={{ color: "info", component: "leaderboard" }}
@@ -87,7 +97,7 @@ function Dashboard() {
                   description="This chart is for budgeting each expense type"
                   height={460}
                   chart={chartData}
-                  setChartData={setChartData}
+                  onChartChange={handleChartChange}
                 />
               </MDBox>
             </Grid>
@@ -108,7 +118,7 @@ function Dashboard() {
                   </MDTypography>
                 </MDBox>
                 <MDBox pt={3}>
-                  <TripLog />
+                  <TripLog onValueChange={handleValueChange} />
                 </MDBox>
               </Card>
             </Grid>

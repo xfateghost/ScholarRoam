@@ -35,10 +35,10 @@ import MDAvatar from "components/MDAvatar";
 import breakpoints from "assets/theme/base/breakpoints";
 
 // Images
-import burceMars from "assets/images/bruce-mars.jpg";
 import backgroundImage from "assets/images/bg-profile.jpeg";
+import naturepfp from "assets/images/naturepfp.jpg";
 
-function Header({ children }) {
+function Header({ ProfileComponent, FormComponent, SettingsComponent }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
 
@@ -64,64 +64,46 @@ function Header({ children }) {
 
   const handleSetTabValue = (event, newValue) => setTabValue(newValue);
 
+  const renderTabContent = () => {
+    switch (tabValue) {
+      case 0:
+        return <ProfileComponent />;
+      case 1:
+        return <FormComponent />;
+      case 2:
+        return <SettingsComponent />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <MDBox position="relative" mb={5}>
-      <MDBox
-        display="flex"
-        alignItems="center"
-        position="relative"
-        minHeight="18.75rem"
-        borderRadius="xl"
-        sx={{
-          backgroundImage: ({ functions: { rgba, linearGradient }, palette: { gradients } }) =>
-            `${linearGradient(
-              rgba(gradients.info.main, 0.6),
-              rgba(gradients.info.state, 0.6)
-            )}, url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "50%",
-          overflow: "hidden",
-        }}
-      />
       <Card
         sx={{
           position: "relative",
-          mt: -8,
           mx: 3,
           py: 2,
           px: 2,
         }}
       >
         <Grid container spacing={3} alignItems="center">
-          <Grid item>
-            <MDAvatar src={burceMars} alt="profile-image" size="xl" shadow="sm" />
-          </Grid>
-          <Grid item>
-            <MDBox height="100%" mt={0.5} lineHeight={1}>
-              <MDTypography variant="h5" fontWeight="medium">
-                Richard Davis
-              </MDTypography>
-              <MDTypography variant="button" color="text" fontWeight="regular">
-                CEO / Co-Founder
-              </MDTypography>
-            </MDBox>
-          </Grid>
           <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
             <AppBar position="static">
               <Tabs orientation={tabsOrientation} value={tabValue} onChange={handleSetTabValue}>
                 <Tab
-                  label="App"
+                  label="Profile"
                   icon={
                     <Icon fontSize="small" sx={{ mt: -0.25 }}>
-                      home
+                      account_circle
                     </Icon>
                   }
                 />
                 <Tab
-                  label="Message"
+                  label="Form"
                   icon={
                     <Icon fontSize="small" sx={{ mt: -0.25 }}>
-                      email
+                      dynamic_form
                     </Icon>
                   }
                 />
@@ -137,20 +119,17 @@ function Header({ children }) {
             </AppBar>
           </Grid>
         </Grid>
-        {children}
+        {renderTabContent()}
       </Card>
     </MDBox>
   );
 }
 
-// Setting default props for the Header
-Header.defaultProps = {
-  children: "",
-};
-
 // Typechecking props for the Header
 Header.propTypes = {
-  children: PropTypes.node,
+  ProfileComponent: PropTypes.elementType.isRequired,
+  FormComponent: PropTypes.elementType.isRequired,
+  SettingsComponent: PropTypes.elementType.isRequired,
 };
 
 export default Header;

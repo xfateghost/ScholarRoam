@@ -1,36 +1,54 @@
 import React, { useState, useRef } from "react";
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import DynamicPlan from "./DynamicChip";
 import FancyPag from "../FancyPag";
-import FormDialog from "examples/Feedback/Dialog";
-import Edit from "@mui/icons-material/Edit";
-import EditCard from "layouts/travel/EditCard";
-import { Chip, IconButton, Stack } from "@mui/material";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import TransferList from "../TransferList";
+import { Grid, Stack, Typography } from "@mui/material";
+import GoogleMapsPlaceholder from "assets/images/GoogleMapsPlaceholder.jpg";
 
 function DynamicChip() {
   return (
     <Box
-      width="100%"
-      height="100%"
+      width="auto"
+      height="auto"
       marginBottom={2}
       display="flex"
       justifyContent="center"
       alignItems="center"
     >
-      <Card style={{ width: "31em", height: "35.7em" }}>
-        <DynamicPlan />
-      </Card>
+      <Grid container spacing={1}>
+        <Grid item xs={12} md={12} lg={6}>
+          <Stack direction="row">
+            <Card style={{ width: "31em", height: "80vh" }}>
+              <DynamicPlan />
+            </Card>
+          </Stack>
+        </Grid>
+        <Grid item xs={0} md={0} lg={6}>
+          <Card style={{ width: "45vw", height: "80vh", position: "relative" }}>
+            <img
+              src={GoogleMapsPlaceholder}
+              alt="Google Maps Placeholder"
+              style={{ width: "100%", height: "100%", borderRadius: "1%" }}
+            />
+            <Box
+              style={{
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                borderRadius: "1%",
+              }}
+            >
+              <Typography variant="h4" style={{ opacity: 1 }}>
+                Map component currently in the works!
+              </Typography>
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

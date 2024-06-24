@@ -31,25 +31,40 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
 import CottageIcon from "@mui/icons-material/Cottage";
 
-const Icon = ({ title, icon }) => {
-  const [clicked, setClicked] = React.useState(false);
+const iconMap = [
+  { title: "Flight", icon: <FlightIcon /> },
+  { title: "Lodging", icon: <CottageIcon /> },
+  { title: "Food", icon: <RestaurantMenuIcon /> },
+  { title: "Drinks", icon: <NightlifeIcon /> },
+  { title: "Shopping", icon: <StoreIcon /> },
+  { title: "Transit", icon: <TrainIcon /> },
+  { title: "Car Rental", icon: <DirectionsCarIcon /> },
+  { title: "Sightseeing", icon: <AccountBalanceIcon /> },
+  { title: "Activities", icon: <GroupIcon /> },
+  { title: "Gas", icon: <LocalGasStationIcon /> },
+  { title: "Groceries", icon: <ShoppingBasketIcon /> },
+  { title: "Other", icon: <AssignmentIcon /> },
+];
 
-  const handleClick = () => {
-    const logEntry = { title: title };
-    console.log(JSON.stringify(logEntry));
-    setClicked(true);
-  };
+const chunkArray = (array, size) => {
+  const result = [];
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size));
+  }
+  return result;
+};
 
+const Icon = ({ title, icon, onClick, selected }) => {
   return (
     <Grid container>
       <CardActionArea
         style={{
           borderRadius: "8px",
-          backgroundColor: clicked ? "lightblue" : "inherit",
+          backgroundColor: selected ? "lightblue" : "inherit",
           width: "120px",
           height: "70px",
         }}
-        onClick={handleClick}
+        onClick={onClick}
       >
         <MDBox shadow="sm" borderRadius="lg" style={{ width: "100%", height: "100%" }}>
           <Grid
@@ -80,6 +95,8 @@ const Icon = ({ title, icon }) => {
 Icon.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.element.isRequired,
+  onClick: PropTypes.func.isRequired,
+  selected: PropTypes.bool.isRequired,
 };
 
 const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(props, ref) {
@@ -109,7 +126,17 @@ NumericFormatCustom.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-function BudgetPicker() {
+function BudgetPicker({ onSelect, onInput }) {
+  const [selectedCard, setSelectedCard] = React.useState(null);
+
+  const rows = chunkArray(iconMap, 4);
+
+  const handleCardClick = (title) => {
+    const selectedIcon = iconMap.find((item) => item.title === title);
+    setSelectedCard(title);
+    onSelect({ title, icon: selectedIcon.icon });
+  };
+
   const [values, setValues] = React.useState({
     numberformat: "",
   });
@@ -119,9 +146,11 @@ function BudgetPicker() {
     console.log(JSON.stringify(logEntry));
     setValues({
       ...values,
-      [event.target.name]: event.target.value,
+      [event.target.name]: newValue,
     });
+    onInput(newValue);
   };
+
   return (
     <MDBox>
       <MDBox style={{ width: "100%" }}>
@@ -155,28 +184,34 @@ function BudgetPicker() {
           />
         </Box>
         <Grid container justifyContent="center">
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Icon title="Flight" icon={<FlightIcon color="black" />} />
-            <Icon title="Lodging" icon={<CottageIcon color="black" />} />
-            <Icon title="Food" icon={<RestaurantMenuIcon color="black" />} />
-            <Icon title="Drinks" icon={<NightlifeIcon color="black" />} />
-          </Stack>
-          <Stack direction="row" spacing={1} alignItems="center" style={{ marginTop: "1rem" }}>
-            <Icon title="Shopping" icon={<StoreIcon color="black" />} />
-            <Icon title="Transit" icon={<TrainIcon color="black" />} />
-            <Icon title="Car Rental" icon={<DirectionsCarIcon color="black" />} />
-            <Icon title="Sightseeing" icon={<AccountBalanceIcon color="black" />} />
-          </Stack>
-          <Stack direction="row" spacing={1} alignItems="center" style={{ marginTop: "1rem" }}>
-            <Icon title="Activities" icon={<GroupIcon color="black" />} />
-            <Icon title=" Gas" icon={<LocalGasStationIcon color="black" />} />
-            <Icon title="Groceries" icon={<ShoppingBasketIcon color="black" />} />
-            <Icon title="Other" icon={<AssignmentIcon color="black" />} />
-          </Stack>
+          {rows.map((row, index) => (
+            <Stack
+              key={index}
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              style={{ marginTop: index > 0 ? "1rem" : 0 }}
+            >
+              {row.map((iconItem, idx) => (
+                <Icon
+                  key={idx}
+                  title={iconItem.title}
+                  icon={iconItem.icon}
+                  onClick={() => handleCardClick(iconItem.title)}
+                  selected={selectedCard === iconItem.title}
+                />
+              ))}
+            </Stack>
+          ))}
         </Grid>
       </MDBox>
     </MDBox>
   );
 }
+
+BudgetPicker.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+  onInput: PropTypes.func.isRequired,
+};
 
 export default BudgetPicker;

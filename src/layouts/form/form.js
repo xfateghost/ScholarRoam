@@ -1,11 +1,63 @@
 import * as React from "react";
 import { Box, Stack, Typography, TextField, Button, Slider, CardActionArea } from "@mui/material";
 import { Checkbox, FormGroup, FormControlLabel, Divider, CardMedia } from "@mui/material";
-import { Card, CardContent, Grid } from "@mui/material";
+import { Card, CardContent, Grid, FormControl } from "@mui/material";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
-function InputQuestion() {
+function BudgetQuestion({ question }) {
+  const [value, setValue] = React.useState(1);
+
+  const handleSliderChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const marks = [
+    {
+      value: 0,
+      label: "$",
+    },
+    {
+      value: 1,
+      label: "$$",
+    },
+    {
+      value: 2,
+      label: "$$$",
+    },
+    {
+      value: 3,
+      label: "$$$$",
+    },
+  ];
+
+  return (
+    <FormControl>
+      <Box style={{ marginBottom: "2rem", marginTop: "4rem", width: "100%" }}>
+        <Typography variant="h2" style={{ marginBottom: "1rem" }}>
+          {question}
+        </Typography>
+        <Slider
+          value={typeof value === "number" ? value : 0}
+          onChange={handleSliderChange}
+          aria-labelledby="input-slider"
+          aria-label="Temperature"
+          defaultValue={1}
+          step={1}
+          marks={marks}
+          min={0}
+          max={3}
+        />
+      </Box>
+    </FormControl>
+  );
+}
+
+BudgetQuestion.propTypes = {
+  question: PropTypes.string.isRequired,
+};
+
+function SliderQuestion({ question }) {
   const [value, setValue] = React.useState(1);
 
   const handleSliderChange = (event, newValue) => {
@@ -25,31 +77,10 @@ function InputQuestion() {
   };
 
   return (
-    <Stack spacing={3}>
-      <Box style={{ marginBottom: "2rem", width: "50vw" }}>
-        <Typography variant="h1" style={{ marginBottom: "1rem" }}>
-          What city are you studying abroad in?
-        </Typography>
-        <Box
-          component="form"
-          noValidate
-          autoComplete="off"
-          style={{
-            width: "100%",
-          }}
-        >
-          <TextField
-            focused
-            fullWidth
-            InputProps={{
-              style: { fontSize: "2rem", padding: "1rem" },
-            }}
-          />
-        </Box>
-      </Box>
-      <Box style={{ marginBottom: "2rem" }}>
-        <Typography variant="h1" style={{ marginBottom: "1rem" }}>
-          How many trips are you planning on going on?
+    <FormControl component="form" required>
+      <Box style={{ marginBottom: "2rem", marginTop: "4rem" }}>
+        <Typography variant="h2" style={{ marginBottom: "1rem" }}>
+          {question}
         </Typography>
         <Slider
           value={typeof value === "number" ? value : 0}
@@ -58,7 +89,6 @@ function InputQuestion() {
           aria-label="Temperature"
           defaultValue={1}
           valueLabelDisplay="auto"
-          shiftStep={4}
           step={1}
           marks
           min={0}
@@ -81,35 +111,93 @@ function InputQuestion() {
           }}
         />
       </Box>
-    </Stack>
+    </FormControl>
   );
 }
 
-function CardOption({ value }) {
+SliderQuestion.propTypes = {
+  question: PropTypes.string.isRequired,
+};
+
+function InputQuestion({ onValueChange }) {
+  const [value, setValue] = React.useState("");
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
+    onValueChange(event.target.value);
+  };
+
   return (
-    <Box>
-      <FormGroup>
-        <CardActionArea
-          style={{
-            border: "1.5px solid black",
-            borderRadius: "1rem",
-            width: "30vw",
-            marginBottom: "1rem",
-          }}
-        >
-          <FormControlLabel
-            control={<Checkbox />}
-            label={value}
-            sx={{
-              padding: "1rem",
-              width: "103%",
-              cursor: "pointer",
-              ".MuiFormControlLabel-label": { fontSize: "1.5rem" },
+    <FormControl required>
+      <Stack spacing={3}>
+        <Box style={{ marginBottom: "2rem", width: "50vw" }}>
+          <Typography variant="h2" style={{ marginBottom: "1rem" }}>
+            What city are you studying abroad in?
+          </Typography>
+          <Box
+            component="form"
+            noValidate
+            autoComplete="off"
+            style={{
+              width: "100%",
             }}
-          />
-        </CardActionArea>
-      </FormGroup>
-    </Box>
+          >
+            <TextField
+              required
+              focused
+              fullWidth
+              value={value}
+              onChange={handleChange}
+              InputProps={{
+                style: { fontSize: "2rem", padding: "1rem" },
+              }}
+            />
+          </Box>
+          <SliderQuestion question="How many trips will you go on?" />
+        </Box>
+      </Stack>
+    </FormControl>
+  );
+}
+
+InputQuestion.propTypes = {
+  onValueChange: PropTypes.func.isRequired,
+};
+
+function CardOption({ value, onValueChange }) {
+  const [checked, setChecked] = React.useState(false);
+
+  const handleChange = (event) => {
+    setChecked(event.target.checked);
+    onValueChange(event.target.checked);
+  };
+
+  return (
+    <FormControl component="form" required>
+      <Box>
+        <FormGroup>
+          <CardActionArea
+            style={{
+              border: "1.5px solid black",
+              borderRadius: "1rem",
+              width: "30vw",
+              marginBottom: "1rem",
+            }}
+          >
+            <FormControlLabel
+              control={<Checkbox checked={checked} onChange={handleChange} />}
+              label={value}
+              sx={{
+                padding: "1rem",
+                width: "103%",
+                cursor: "pointer",
+                ".MuiFormControlLabel-label": { fontSize: "1.5rem" },
+              }}
+            />
+          </CardActionArea>
+        </FormGroup>
+      </Box>
+    </FormControl>
   );
 }
 
@@ -121,12 +209,50 @@ function Question({ question }) {
   );
 }
 
-function FormQuestions() {
+function FormQuestions(props) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
+  const [inputValue, setInputValue] = React.useState("");
+  const [checkboxValue, setCheckboxValue] = React.useState(false);
+  const [buttonCount, setButtonCount] = React.useState(0);
+
   const navigate = useNavigate();
 
+  const handleNextClick = () => {
+    if (validateCurrentQuestion()) {
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setButtonCount(buttonCount + 1);
+        props.updateButtonCount(buttonCount + 1);
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  };
+
+  const validateCurrentQuestion = () => {
+    if (currentQuestionIndex === 0 && inputValue.trim() === "") {
+      return false;
+    }
+    if (questions[currentQuestionIndex].options && !checkboxValue) {
+      return false;
+    }
+    return true;
+  };
+
   const questions = [
-    { component: <InputQuestion /> },
+    { component: <InputQuestion onValueChange={setInputValue} /> },
+    {
+      component: (
+        <>
+          <Box sx={{ width: "50vw" }}>
+            <Stack>
+              <BudgetQuestion question="What is your budget?" />
+              <SliderQuestion question="How many people will travel with you?" />
+            </Stack>
+          </Box>
+        </>
+      ),
+    },
     {
       component: <Question question="Which season are you studying abroad?" />,
       options: ["Fall", "Winter", "Spring", "Summer"],
@@ -160,7 +286,7 @@ function FormQuestions() {
       options: ["Relaxed", "Balanced", "Have to see everything"],
     },
     {
-      component: <Question question="What type of accomodations you you prefer?" />,
+      component: <Question question="What type of accomodations you prefer?" />,
       options: ["Hotels", "Airbnb", "Hostels"],
     },
     {
@@ -200,14 +326,6 @@ function FormQuestions() {
     },
   ];
 
-  const handleNextClick = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      navigate("/dashboard");
-    }
-  };
-
   return (
     <div>
       <Box
@@ -224,12 +342,13 @@ function FormQuestions() {
         <Box style={{ width: "80%", height: "70%", padding: "1rem" }}>
           {questions[currentQuestionIndex].options &&
             questions[currentQuestionIndex].options.map((option, index) => (
-              <CardOption key={index} value={option} />
+              <CardOption key={index} value={option} onValueChange={setCheckboxValue} />
             ))}
         </Box>
         <Box style={{ position: "absolute", bottom: 16, right: 16 }}>
           <Button
             onClick={handleNextClick}
+            disabled={!validateCurrentQuestion()}
             style={{
               fontSize: "1.5rem",
               padding: "1rem 1.5rem",
@@ -248,8 +367,13 @@ function FormQuestions() {
 
 export default FormQuestions;
 
+FormQuestions.propTypes = {
+  updateButtonCount: PropTypes.func.isrequired,
+};
+
 CardOption.propTypes = {
   value: PropTypes.string.isRequired,
+  onValueChange: PropTypes.func.isRequired,
 };
 
 Question.propTypes = {

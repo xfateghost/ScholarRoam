@@ -1,22 +1,10 @@
-import { Card, IconButton } from "@mui/material";
 import { Grid } from "@mui/material";
 import MDBox from "components/MDBox";
 import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
 import CardActionArea from "@mui/material/CardActionArea";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import InputAdornment from "@mui/material/InputAdornment";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import Input from "@mui/material/Input";
 import PropTypes from "prop-types";
 import * as React from "react";
-import { NumericFormat } from "react-number-format";
 
 import FlightIcon from "@mui/icons-material/Flight";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
@@ -24,25 +12,25 @@ import DirectionsSubwayIcon from "@mui/icons-material/DirectionsSubway";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 
-const Icon = ({ title, icon }) => {
-  const [clicked, setClicked] = React.useState(false);
+const iconMap = {
+  Flight: <FlightIcon />,
+  Car: <DirectionsCarIcon />,
+  Bus: <DirectionsBusIcon />,
+  Boat: <DirectionsBoatIcon />,
+  Train: <DirectionsSubwayIcon />,
+};
 
-  const handleClick = () => {
-    const logEntry = { title: title };
-    console.log(JSON.stringify(logEntry));
-    setClicked(true);
-  };
-
+const Icon = ({ title, icon, onClick, selected }) => {
   return (
     <Grid container>
       <CardActionArea
         style={{
           borderRadius: "8px",
-          backgroundColor: clicked ? "lightblue" : "inherit",
+          backgroundColor: selected ? "lightblue" : "inherit",
           width: "100px",
           height: "70px",
         }}
-        onClick={handleClick}
+        onClick={onClick}
       >
         <MDBox shadow="sm" borderRadius="lg" style={{ width: "100%", height: "100%" }}>
           <Grid
@@ -73,24 +61,41 @@ const Icon = ({ title, icon }) => {
 Icon.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.element.isRequired,
+  onClick: PropTypes.func.isRequired,
+  selected: PropTypes.bool.isRequired,
 };
 
-function DestinationPicker() {
+function DestinationPicker({ onSelect }) {
+  const [selectedCard, setSelectedCard] = React.useState(null);
+
+  const handleCardClick = (title) => {
+    setSelectedCard(title);
+    onSelect({ title, icon: iconMap[title] });
+  };
+
   return (
     <MDBox>
       <MDBox style={{ width: "100%", marginTop: "1rem" }}>
         <Grid container justifyContent="center">
           <Stack direction="row" spacing={1} alignItems="center">
-            <Icon title="Flight" icon={<FlightIcon color="black" />} />
-            <Icon title="Car" icon={<DirectionsCarIcon color="black" />} />
-            <Icon title="Bus" icon={<DirectionsBusIcon color="black" />} />
-            <Icon title="Boat" icon={<DirectionsBoatIcon color="black" />} />
-            <Icon title="Train" icon={<DirectionsSubwayIcon color="black" />} />
+            {Object.keys(iconMap).map((title) => (
+              <Icon
+                key={title}
+                title={title}
+                icon={iconMap[title]}
+                onClick={() => handleCardClick(title)}
+                selected={selectedCard === title}
+              />
+            ))}
           </Stack>
         </Grid>
       </MDBox>
     </MDBox>
   );
 }
+
+DestinationPicker.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+};
 
 export default DestinationPicker;

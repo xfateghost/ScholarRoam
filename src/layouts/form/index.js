@@ -14,38 +14,35 @@ import InstantQuestions from "./instantform";
 import Autocomplete from "@mui/material/Autocomplete";
 import { CardContent, CardActionArea, CardMedia } from "@mui/material";
 import PropTypes from "prop-types";
+import { useEffect, useMemo, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadFull } from "tsparticles";
 
-function LinearDeterminate() {
-  const [progress, setProgress] = React.useState(0);
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((oldProgress) => {
-        if (oldProgress === 100) {
-          return 0;
-        }
-        const diff = Math.random() * 10;
-        return Math.min(oldProgress + diff, 100);
-      });
-    }, 500);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+function ProgressBar(props) {
   return (
-    <Box sx={{ width: "100%" }}>
-      <LinearProgress variant="determinate" value={progress} />
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ width: "100%", mr: 1 }}>
+        <LinearProgress variant="determinate" {...props} />
+      </Box>
+      <Box sx={{ minWidth: 45 }}>
+        <Typography variant="body2" color="text.secondary">{`${Math.round(
+          props.value
+        )}%`}</Typography>
+      </Box>
     </Box>
   );
 }
+
+ProgressBar.propTypes = {
+  value: PropTypes.number.isRequired,
+};
 
 function StartQuestion({ onStart, onInstant }) {
   return (
     <Grid container spacing={20}>
       <Grid item xs={6} md={6} lg={6}>
-        <Card sx={{ width: "20em" }}>
-          <CardActionArea onClick={onStart}>
+        <Card sx={{ width: "20em", height: "70vh" }}>
+          <CardActionArea onClick={onStart} sx={{ height: "100%" }}>
             <CardMedia
               height="100%"
               image="https://img.freepik.com/premium-vector/vector-flying-blue-diamond-gemstone-illustration-icon_679085-676.jpg"
@@ -65,8 +62,8 @@ function StartQuestion({ onStart, onInstant }) {
         </Card>
       </Grid>
       <Grid item xs={6} md={6} lg={6}>
-        <Card sx={{ width: "20em" }}>
-          <CardActionArea onClick={onInstant}>
+        <Card sx={{ width: "20em", height: "70vh" }}>
+          <CardActionArea onClick={onInstant} sx={{ height: "100%" }}>
             <CardMedia
               height="100%"
               image="https://img.freepik.com/free-vector/thunderbolt-icon-illustration_32991-970.jpg"
@@ -90,7 +87,15 @@ function StartQuestion({ onStart, onInstant }) {
 }
 
 export default function SignUpForm() {
+  const [init, setInit] = useState(false);
   const [showQuestions, setShowQuestions] = React.useState(false);
+  const [totalClicks, setTotalClicks] = useState(0);
+
+  const updateButtonCount = () => {
+    setTotalClicks(totalClicks + 1);
+  };
+
+  const progressPercentage = (totalClicks / 14) * 100;
 
   const handleStart = () => {
     setShowQuestions(true);
@@ -102,20 +107,101 @@ export default function SignUpForm() {
     setShowInstant(true);
   };
 
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadFull(engine);
+    }).then(() => {
+      setInit(true);
+    });
+  }, []);
+
+  const particlesLoaded = (container) => {
+    console.log(container);
+  };
+
+  const options = useMemo(
+    () => ({
+      fpsLimit: 120,
+      interactivity: {
+        events: {
+          onClick: {
+            enable: true,
+            mode: "push",
+          },
+          onHover: {
+            enable: true,
+            mode: "repulse",
+          },
+        },
+        modes: {
+          push: {
+            quantity: 10,
+          },
+          repulse: {
+            distance: 150,
+            duration: 0.4,
+          },
+        },
+      },
+      particles: {
+        color: {
+          value: "#0d47a1",
+        },
+        links: {
+          color: "#0d47a1",
+          distance: 150,
+          enable: true,
+          opacity: 0.5,
+          width: 1,
+        },
+        move: {
+          direction: "none",
+          enable: true,
+          outModes: {
+            default: "bounce",
+          },
+          random: false,
+          speed: 4,
+          straight: false,
+        },
+        number: {
+          density: {
+            enable: true,
+          },
+          value: 150,
+        },
+        opacity: {
+          value: 0.5,
+        },
+        shape: {
+          type: "circle",
+        },
+        size: {
+          value: { min: 1, max: 5 },
+        },
+      },
+      detectRetina: true,
+    }),
+    []
+  );
+
   return (
     <PageLayout>
-      <Box style={{ margin: "1rem" }}>
-        <Box component={Link} to="/" py={1.5} lineHeight={1} pl={{ xs: 0, lg: 0 }}>
-          <Typography variant="button" fontWeight="bold">
+      <div className="particles-container">
+        {init && <Particles id="tsparticles" particlesLoaded={particlesLoaded} options={options} />}
+      </div>
+      <Card sx={{ textAlign: "center", borderRadius: "0", padding: "0.8rem" }}>
+        <Box component={Link} to="/dashboard" lineHeight={3} ml={5}>
+          <Typography variant="h3" fontWeight="bold">
             ScholarRoam
           </Typography>
         </Box>
-        <Stack>
-          <Typography variant="overline">Section 1 of 5</Typography>
-          <Typography variant="caption">Share info about your trip</Typography>
-        </Stack>
-      </Box>
-      <LinearDeterminate />
+        {showQuestions && (
+          <Box sx={{ width: "100%" }}>
+            <ProgressBar value={progressPercentage} />
+          </Box>
+        )}
+      </Card>
       <Box>
         <Grid
           container
@@ -138,7 +224,7 @@ export default function SignUpForm() {
             >
               <Box>
                 {showQuestions ? (
-                  <FormQuestions />
+                  <FormQuestions updateButtonCount={updateButtonCount} />
                 ) : showInstant ? (
                   <InstantQuestions />
                 ) : (

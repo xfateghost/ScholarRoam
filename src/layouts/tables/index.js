@@ -17,6 +17,7 @@ import React, { useState } from "react";
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import { Button, Stack } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -29,12 +30,128 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 import DynamicBarChart from "examples/Charts/BarCharts/DynamicBarChart";
 import VerticalBarChart from "examples/Charts/BarCharts/VerticalBarChart";
+import HorizontalBarChart from "examples/Charts/BarCharts/HorizontalBarChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import FormDialog from "examples/Feedback/Dialog";
 
 // Data
 import BudgetMaker from "examples/BudgetMaker";
 
 function Budget() {
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const [saveChartData, setSaveChartData] = useState({
+    labels: ["Madrid", "Vienna", "Stockholm", "London", "Sevilla", "Berlin"],
+    datasets: [
+      {
+        label: "Budgeted Cost ($)",
+        data: [100, 200, 150, 300, 250, 100],
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.8)",
+          "rgba(255, 159, 64, 0.8)",
+          "rgba(255, 205, 86, 0.8)",
+          "rgba(75, 192, 192, 0.8)",
+          "rgba(54, 162, 235, 0.8)",
+          "rgba(153, 102, 255, 0.8)",
+        ],
+      },
+      {
+        label: "Additional Cost ($)",
+        data: [30, 40, 20, 50, 60, 10],
+        backgroundColor: "rgba(201, 203, 207, 0.8)",
+      },
+    ],
+  });
+
+  const [chartData, setChartData] = useState({
+    labels: [
+      "Flight",
+      "Lodging",
+      "Food",
+      "Drinks",
+      "Shopping",
+      "Transit",
+      "Car Rental",
+      "Sightseeing",
+      "Activities",
+      "Gas",
+      "Groceries",
+      "Other",
+    ],
+    datasets: [
+      {
+        label: "$",
+        data: [],
+        backgroundColor: [
+          "rgba(255, 99, 132)",
+          "rgba(255, 159, 64)",
+          "rgba(255, 205, 86)",
+          "rgba(75, 192, 192)",
+          "rgba(54, 162, 235)",
+          "rgba(153, 102, 255)",
+          "rgba(201, 203, 207)",
+          "rgba(255, 99, 132)",
+          "rgba(255, 159, 64)",
+          "rgba(255, 205, 86)",
+          "rgba(75, 192, 192)",
+          "rgba(54, 162, 235)",
+          "rgba(153, 102, 255)",
+          "rgba(201, 203, 207)",
+          "rgba(255, 99, 132)",
+          "rgba(255, 159, 64)",
+          "rgba(255, 205, 86)",
+          "rgba(75, 192, 192)",
+          "rgba(54, 162, 235)",
+          "rgba(153, 102, 255)",
+          "rgba(201, 203, 207)",
+          "rgba(255, 99, 132)",
+          "rgba(255, 159, 64)",
+          "rgba(255, 205, 86)",
+          "rgba(75, 192, 192)",
+          "rgba(54, 162, 235)",
+          "rgba(153, 102, 255)",
+          "rgba(201, 203, 207)",
+        ],
+      },
+    ],
+  });
+
+  const handleExpense = (newValue) => {
+    const { title, amount } = newValue;
+
+    setChartData((prevChartData) => {
+      const labelIndex = prevChartData.labels.indexOf(title);
+
+      if (labelIndex >= 0) {
+        const newData = [...prevChartData.datasets[0].data];
+
+        const existingAmount = parseFloat(newData[labelIndex]) || 0;
+        const newAmount = parseFloat(amount) || 0;
+        newData[labelIndex] = existingAmount + newAmount;
+
+        const updatedDataset = {
+          ...prevChartData.datasets[0],
+          data: newData,
+        };
+
+        return {
+          ...prevChartData,
+          datasets: [updatedDataset],
+        };
+      } else {
+        return prevChartData;
+      }
+    });
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -103,41 +220,12 @@ function Budget() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={8} lg={8}>
             <MDBox mb={7}>
-              <VerticalBarChart
+              <HorizontalBarChart
                 icon={{ color: "success", component: "leaderboard" }}
-                title="Expenses by Month"
-                description="This chart breaks down monthly expenses by type"
+                title="Trip Savings"
+                description="Trip costs if you book ahead vs. last minute"
                 height={460}
-                chart={{
-                  labels: ["January", "February", "March", "April", "May"],
-                  datasets: [
-                    {
-                      label: "Travel",
-                      color: "success",
-                      data: [320, 375, 425, 380, 400, 450],
-                    },
-                    {
-                      label: "Food",
-                      color: "warning",
-                      data: [500, 575, 625, 580, 700, 750],
-                    },
-                    {
-                      label: "Nightlife",
-                      color: "dark",
-                      data: [100, 75, 125, 80, 100, 150],
-                    },
-                    {
-                      label: "Groceries",
-                      color: "info",
-                      data: [150, 175, 225, 180, 200, 250],
-                    },
-                    {
-                      label: "Shopping",
-                      color: "error",
-                      data: [100, 75, 25, 80, 100, 150],
-                    },
-                  ],
-                }}
+                chart={saveChartData}
               />
             </MDBox>
           </Grid>
@@ -153,17 +241,38 @@ function Budget() {
                 borderRadius="lg"
                 coloredShadow="success"
               >
-                <MDTypography variant="h6" color="white">
-                  Track Expenses
-                </MDTypography>
+                <Stack direction="row">
+                  <MDTypography variant="h6" color="white">
+                    Track Expenses
+                  </MDTypography>
+                  <Button
+                    color="secondary"
+                    onClick={handleClickOpen}
+                    variant="contained"
+                    sx={{ marginLeft: "auto", marginTop: -1, width: "10px", height: "10px" }}
+                  >
+                    Show Chart
+                  </Button>
+                </Stack>
               </MDBox>
               <MDBox pt={3}>
-                <BudgetMaker />
+                <BudgetMaker onExpense={handleExpense} />
               </MDBox>
             </Card>
           </Grid>
         </Grid>
       </MDBox>
+      <FormDialog
+        title="Expenses by Type"
+        description="This chart breaks down expenses by type."
+        open={open}
+        showTextField={false}
+        handleClose={handleClose}
+        ExitButton=""
+        SaveButton="Exit"
+        onEnter={() => console.log("Click")}
+        component={<HorizontalBarChart height={460} chart={chartData} />}
+      />
       <Footer />
     </DashboardLayout>
   );

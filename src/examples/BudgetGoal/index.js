@@ -1,7 +1,5 @@
 import React from "react";
-import { Grid, Card, Box, TextField, Typography } from "@mui/material";
-import { Slider } from "@mui/material";
-import { NumericFormat } from "react-number-format";
+import { Grid, Card, Slider } from "@mui/material";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import PropTypes from "prop-types";
 
@@ -13,15 +11,16 @@ const marks = Array.from({ length: 12 }, (_, i) => {
   };
 });
 
-function BudgetGoal() {
-  const [value, setValue] = React.useState(8500);
+function BudgetGoal({ budget, onValueChange, totalBudget }) {
+  const [value, setValue] = React.useState(totalBudget);
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
+    onValueChange(newValue);
   };
 
-  const formattedValue = `$${new Intl.NumberFormat().format(value)}`;
-  const roundedValue = Math.round(value / 700);
+  const formattedValue = `$${new Intl.NumberFormat().format(totalBudget)}`;
+  const roundedValue = Math.round(totalBudget / 700);
 
   return (
     <Grid container spacing={4} style={{ marginBottom: "3rem", marginTop: 0.01 }}>
@@ -51,13 +50,11 @@ function BudgetGoal() {
         />
       </Grid>
       <Grid item xs={6} md={6} lg={6}>
-        <Card style={{ padding: "2rem" }}>
+        <Card style={{ padding: "1.72rem" }}>
           <Slider
-            value={typeof value === "number" ? value : 0}
+            value={value}
             onChange={handleSliderChange}
             aria-label="Budget"
-            defaultValue={8500}
-            shiftStep={5000}
             step={100}
             marks={marks}
             min={4000}
@@ -68,5 +65,11 @@ function BudgetGoal() {
     </Grid>
   );
 }
+
+BudgetGoal.propTypes = {
+  budget: PropTypes.number.isRequired,
+  onValueChange: PropTypes.func.isRequired,
+  totalBudget: PropTypes.number.isRequired,
+};
 
 export default BudgetGoal;

@@ -17,7 +17,26 @@ export default function FormDialog({
   handleClose,
   component,
   showTextField,
+  onEnter,
+  ExitButton,
+  SaveButton,
+  isFormValid,
+  onInput,
+  inputValue,
 }) {
+  const [values, setValues] = React.useState("");
+
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    const logEntry = { event: newValue };
+    console.log(JSON.stringify(logEntry));
+    setValues({
+      ...values,
+      [event.target.name]: newValue,
+    });
+    onInput(newValue);
+  };
+
   return (
     <React.Fragment>
       <Dialog
@@ -27,10 +46,6 @@ export default function FormDialog({
           component: "form",
           onSubmit: (event) => {
             event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries(formData.entries());
-            const entry = formJson.entry;
-            console.log("entry:", entry);
             handleClose();
           },
         }}
@@ -43,19 +58,23 @@ export default function FormDialog({
               autoFocus
               margin="dense"
               label={textlabel}
+              defaultValue={inputValue}
               fullWidth
               variant="standard"
               name="entry"
               type="entry"
               noValidate
               autoComplete="off"
+              onChange={handleChange}
             />
           )}
           {component}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Save</Button>
+          <Button onClick={handleClose}>{ExitButton}</Button>
+          <Button type="submit" onClick={onEnter} disabled={!isFormValid}>
+            {SaveButton}
+          </Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>
@@ -70,4 +89,20 @@ FormDialog.propTypes = {
   handleClose: PropTypes.func.isRequired,
   component: PropTypes.element.isRequired,
   showTextField: PropTypes.bool.isRequired,
+  onEnter: PropTypes.func.isRequired,
+  ExitButton: PropTypes.string.isRequired,
+  SaveButton: PropTypes.string.isRequired,
+  isFormValid: PropTypes.bool.isRequired,
+  onInput: PropTypes.func.isRequired,
+  inputValue: PropTypes.string,
+};
+
+FormDialog.defaultProps = {
+  title: "Default Title",
+  description: "Default Description",
+  textlabel: "Default Label",
+  open: false,
+  showTextField: true,
+  ExitButton: "Cancel",
+  SaveButton: "Save",
 };

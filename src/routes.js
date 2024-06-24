@@ -47,6 +47,7 @@ import SignUp from "layouts/authentication/sign-up";
 import Itinerary from "layouts/itinerary";
 import Form from "layouts/form";
 import HomePage from "layouts/home";
+import Upgrade from "examples/Upgrade";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -62,10 +63,10 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Expense Breakdown",
-    key: "expense-breakdown",
+    name: "ScholarSave",
+    key: "scholar-save",
     icon: <Icon fontSize="small">price_change</Icon>,
-    route: "/expense-breakdown",
+    route: "/scholar-save",
     component: <Budget />,
   },
   {
@@ -115,6 +116,13 @@ const routes = [
     icon: <Icon fontSize="small">home</Icon>,
     route: "/home",
     component: <HomePage />,
+  },
+  {
+    name: "Upgrade",
+    key: "upgrade",
+    icon: <Icon fontSize="small">upgrade</Icon>,
+    route: "/upgrade",
+    component: <Upgrade />,
   },
 ];
 

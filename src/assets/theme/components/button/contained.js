@@ -25,14 +25,8 @@ const { size } = typography;
 
 const contained = {
   base: {
-    backgroundColor: white.main,
     minHeight: pxToRem(40),
-    color: text.main,
     padding: `${pxToRem(10)} ${pxToRem(24)}`,
-
-    "&:hover": {
-      backgroundColor: white.main,
-    },
 
     "&:active, &:active:focus, &:active:hover": {
       opacity: 0.85,
@@ -60,30 +54,6 @@ const contained = {
 
     "& .material-icon, .material-icons-round, svg": {
       fontSize: `${pxToRem(22)} !important`,
-    },
-  },
-
-  primary: {
-    backgroundColor: info.main,
-
-    "&:hover": {
-      backgroundColor: info.main,
-    },
-
-    "&:focus:not(:hover)": {
-      backgroundColor: info.focus,
-    },
-  },
-
-  secondary: {
-    backgroundColor: secondary.main,
-
-    "&:hover": {
-      backgroundColor: secondary.main,
-    },
-
-    "&:focus:not(:hover)": {
-      backgroundColor: secondary.focus,
     },
   },
 };

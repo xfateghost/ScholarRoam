@@ -16,11 +16,12 @@ import PropTypes from "prop-types";
 import { CssBaseline, useScrollTrigger } from "@mui/material";
 
 function ElevationScroll(props) {
-  const { children } = props;
+  const { children, window } = props;
 
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 0,
+    target: window ? window() : undefined,
   });
 
   return React.cloneElement(children, {
@@ -28,12 +29,8 @@ function ElevationScroll(props) {
   });
 }
 
-ElevationScroll.propTypes = {
-  children: PropTypes.element.isRequired,
-};
-
-const pages = ["Home", "How it works", "Pricing", "Use Cases", "FAQ", "Login", "Sign Up"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const pages = ["Home", "What We Offer", "How It Works", "FAQ", "Contact Us"];
+const settings = ["Profile", "Account", "Login", "Sign Up"];
 
 function ResponsiveAppBar(props) {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -58,14 +55,11 @@ function ResponsiveAppBar(props) {
     <React.Fragment>
       <CssBaseline>
         <ElevationScroll {...props}>
-          <AppBar>
+          <AppBar
+            sx={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)", borderRadius: "0 0 10px 10px" }}
+          >
             <Container maxWidth="xl">
               <Toolbar disableGutters>
-                <img
-                  src="https://www.svgrepo.com/show/424931/google-earth-logo.svg"
-                  alt="Logo"
-                  style={{ height: "1.25rem", marginRight: "0.5rem" }}
-                />
                 <Typography
                   variant="h6"
                   noWrap

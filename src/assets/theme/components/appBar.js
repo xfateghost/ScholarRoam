@@ -15,13 +15,7 @@ Coded by www.creative-tim.com
 
 const appBar = {
   defaultProps: {
-    color: "transparent",
-  },
-
-  styleOverrides: {
-    root: {
-      boxShadow: "none",
-    },
+    color: "white",
   },
 };
 

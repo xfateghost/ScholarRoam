@@ -4,7 +4,6 @@
   "private": false,
   "author": "Alex Ferrone",
   "description": "Travel Plan for study abroad",
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xfateghost/ScholarRoam.git"
@@ -33,6 +32,7 @@
     "dayjs": "^1.11.10",
     "mdb-react-ui-kit": "^7.2.0",
     "moment": "^2.30.1",
+    "particles-bg": "^2.5.5",
     "prop-types": "15.8.1",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
@@ -51,8 +51,10 @@
     "react-scripts": "5.0.1",
     "react-table": "7.8.0",
     "react-transition-group": "^4.4.5",
+    "react-tsparticles": "^2.12.2",
     "stylis": "4.1.4",
     "tachyons": "^4.12.0",
+    "tsparticles": "^3.4.0",
     "yup": "1.1.1"
   },
   "scripts": {
