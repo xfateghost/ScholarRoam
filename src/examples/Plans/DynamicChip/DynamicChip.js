@@ -37,9 +37,10 @@ import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Menu from "@mui/material/Menu";
 import { pink } from "@mui/material/colors";
+import EditIcon from "@mui/icons-material/Edit";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import SaveIcon from "@mui/icons-material/Save";
-import { format, eachDayOfInterval } from "date-fns";
+import { format, eachDayOfInterval, parse } from "date-fns";
 
 import CityData from "./Data/CityData";
 import FoodData from "./Data/FoodData";
@@ -320,7 +321,12 @@ export default function DynamicPlan() {
   const [checkedState, setCheckedState] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [trips, setTrips] = useState([]);
-  const [selectedTrip, setSelectedTrip] = useState([]);
+  const [selectedTrip, setSelectedTrip] = useState({
+    dateRange: {
+      startDate: [],
+      endDate: [],
+    },
+  });
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -333,8 +339,9 @@ export default function DynamicPlan() {
     return defaultEndDate.toISOString().substr(0, 10);
   });
   const [dayIndexArray, setDayIndexArray] = useState([]);
-  const [shortDateArray, setShortDateArray] = useState([]);
   const [shortDateRange, setShortDateRange] = useState([]);
+  const [shortDateArray, setShortDateArray] = useState([]);
+  const [cityDates, setCityDates] = useState([]);
   const [cityArray, setCityArray] = useState(["Madrid"]);
   const [activeTrip, setActiveTrip] = useState(cityArray[0]);
   const [isEditing, setIsEditing] = useState(false);
@@ -342,47 +349,62 @@ export default function DynamicPlan() {
   const [tempSelectedCity, setTempSelectedCity] = useState("");
   const [tempDateRange, setTempDateRange] = useState({ startDate: "", endDate: "" });
 
-  const updateDayIndexArrayForActiveTrip = (start, end) => {
-    setDayIndexArray((prevDayIndexArray) => {
+  const updateDayIndexArrayForActiveTrip = (start, end, newDayIndexArray) => {
+    setDayIndexArray((prevDayIndexArray = {}) => {
       const datesArray = eachDayOfInterval({ start, end }).map((date) => ({
         fullDate: format(date, "EEEE, MMMM do"),
       }));
-      const newDayIndexArray = datesArray.map((date) => date.fullDate);
-      return {
-        ...prevDayIndexArray,
-        [activeTrip]: newDayIndexArray,
-      };
+      const dayIndexArray = newDayIndexArray || datesArray.map((date) => date.fullDate);
+
+      if (activeTrip) {
+        return {
+          ...prevDayIndexArray,
+          [activeTrip]: dayIndexArray,
+        };
+      }
+
+      return dayIndexArray;
     });
   };
 
-  const updateShortDateRangeForActiveTrip = (start, end) => {
-    setShortDateRange((prevShortDateRange) => {
+  const updateShortDateRangeForActiveTrip = (start, end, newShortDateRange) => {
+    setShortDateRange((prevShortDateRange = {}) => {
       const datesArray = eachDayOfInterval({ start, end }).map((date) => ({
         shortRange: format(date, "M/d"),
       }));
-      const newShortDateRange = datesArray.map((date) => date.shortRange);
-      return {
-        ...prevShortDateRange,
-        [activeTrip]: newShortDateRange,
-      };
+      const shortDateRange = newShortDateRange || datesArray.map((date) => date.shortRange);
+
+      if (activeTrip) {
+        return {
+          ...prevShortDateRange,
+          [activeTrip]: shortDateRange,
+        };
+      }
+
+      return shortDateRange;
     });
   };
 
-  const updateShortDateArrayForActiveTrip = (start, end) => {
-    setShortDateArray((prevShortDateArray) => {
+  const updateShortDateArrayForActiveTrip = (start, end, newShortDateArray) => {
+    setShortDateArray((prevShortDateArray = {}) => {
       const datesArray = eachDayOfInterval({ start, end }).map((date) => ({
         shortDate: format(date, "M/d"),
       }));
-      const newShortDateArray = datesArray.map((date) => date.shortDate);
-      return {
-        ...prevShortDateArray,
-        [activeTrip]: newShortDateArray,
-      };
+      const shortDateArray = newShortDateArray || datesArray.map((date) => date.shortDate);
+
+      if (activeTrip) {
+        return {
+          ...prevShortDateArray,
+          [activeTrip]: shortDateArray,
+        };
+      }
+
+      return shortDateArray;
     });
   };
 
   const handleDateChange = (start, end) => {
-    if (start && end && activeTrip) {
+    if (start && end) {
       const startDate = new Date(start);
       const endDate = new Date(end);
 
@@ -402,7 +424,7 @@ export default function DynamicPlan() {
   }, []);
 
   const getLabelForActiveTrip = () => {
-    const dates = shortDateRange[activeTrip];
+    const dates = activeTrip ? shortDateRange[activeTrip] : shortDateRange;
     if (dates && dates.length > 0) {
       return `${dates[0]} to ${dates[dates.length - 1]}`;
     }
@@ -668,12 +690,6 @@ export default function DynamicPlan() {
     [tasks, activeTrip, activeChip]
   );
 
-  const handleEnterCity = (city) => {
-    setTempSelectedCity(city);
-    setActiveTrip(city);
-    console.log(city);
-  };
-
   React.useEffect(() => {
     validateForm();
   }, [selectedTrip]);
@@ -682,35 +698,37 @@ export default function DynamicPlan() {
     setIsFormValid(true);
   };
 
-  const handleDateEnterForm = (startDate, endDate) => {
-    setTempDateRange({ startDate, endDate });
-    console.log(startDate, endDate);
-  };
-
   const handleDateEnter = (startDate, endDate) => {
     setSelectedTrip((prev) => ({ ...prev, dateRange: { startDate, endDate } }));
     console.log(startDate, endDate);
     handleDateChange(startDate, endDate);
   };
 
+  const handleEnterCity = (city) => {
+    setTextValue(city);
+    setActiveTrip(city);
+  };
+
   const handleEnter = () => {
+    const updatedCityArray = [...cityArray, textValue];
     const { startDate, endDate } = tempDateRange;
-    if (!tempSelectedCity || !startDate || !endDate) {
-      console.error("City or date range are not selected.");
-      return;
-    }
 
-    const updatedCityArray = [...cityArray, tempSelectedCity];
     setCityArray(updatedCityArray);
+    setActiveTrip(textValue);
 
-    setSelectedTrip((prev) => [...prev, { dateRange: { startDate, endDate } }]);
+    setSelectedTrip((prev) => ({
+      ...prev,
+      tempDateRange: { startDate, endDate },
+    }));
 
     handleDateChange(startDate, endDate);
 
-    console.log("Data entered:", { city: tempSelectedCity, dateRange: tempDateRange });
-
-    setTempSelectedCity("");
+    setTextValue("");
     setTempDateRange({ startDate: "", endDate: "" });
+  };
+
+  const handleDateEnterForm = (startDate, endDate) => {
+    setTempDateRange({ startDate, endDate });
   };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -730,28 +748,8 @@ export default function DynamicPlan() {
     setIsEditing(true);
   };
 
-  const handleChange = (event) => {
+  const handleCityChange = (event) => {
     setTextValue(event.target.value);
-  };
-
-  const handleBlur = () => {
-    const updatedCityArray = [...cityArray];
-
-    const index = updatedCityArray.indexOf(activeTrip);
-
-    if (index !== -1) {
-      updatedCityArray.splice(index, 1, textValue);
-      setCityArray(updatedCityArray);
-      setActiveTrip(textValue);
-    }
-
-    setSelectedTrip((prev) => [...prev, { [activeTrip]: { startDate, endDate } }]);
-
-    handleDateChange(startDate, endDate);
-
-    console.log(textValue, startDate, endDate);
-
-    setIsEditing(false);
   };
 
   const handleTripChange = (city) => {
@@ -818,35 +816,20 @@ export default function DynamicPlan() {
             style={{ minWidth: 150, textAlign: "center", marginLeft: "7em" }}
             onDoubleClick={handleDoubleClick}
           >
-            {isEditing ? (
-              <TextField
-                variant="standard"
-                value={textValue}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                autoFocus
-                sx={{
-                  marginRight: "8.6em",
-                  marginTop: "7px",
-                  "& .MuiInputBase-input": {
-                    textAlign: "center",
-                    fontSize: "1.5em",
-                  },
-                }}
-              />
-            ) : (
-              <Select value={activeTrip} displayEmpty>
-                {cityArray.map((city) => (
-                  <MenuItem key={city} value={city} onClick={() => handleTripChange(city)}>
-                    <Typography>{city}</Typography>
-                  </MenuItem>
-                ))}
-                <MenuItem value={"Add new"} onClick={handleClickOpen}>
-                  <Typography>Add new</Typography>
+            <Select value={activeTrip} displayEmpty>
+              {cityArray.map((city) => (
+                <MenuItem key={city} value={city} onClick={() => handleTripChange(city)}>
+                  <Typography>{city}</Typography>
                 </MenuItem>
-              </Select>
-            )}
+              ))}
+              <MenuItem value={"Add new"} onClick={handleClickOpen}>
+                <Typography>Add new</Typography>
+              </MenuItem>
+            </Select>
           </FormControl>
+          <IconButton style={{ marginLeft: "auto" }} onClick={handleClickOpen}>
+            <EditIcon />
+          </IconButton>
         </Card>
         <nav style={{ position: "sticky", top: 0 }}>
           <Card
@@ -1004,6 +987,7 @@ export default function DynamicPlan() {
           description="Here you can edit the name of your city as well as your travel dates."
           textlabel="City"
           open={open}
+          inputValue={activeTrip}
           onInput={handleEnterCity}
           handleClose={handleClose}
           isFormValid={isFormValid}
